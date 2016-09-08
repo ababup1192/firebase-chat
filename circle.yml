@@ -1,0 +1,8 @@
+dependencies:
+  override:
+    - npm install -g typings
+    - npm install
+    - typings install
+test:
+  override:
+    - npm run single-test
