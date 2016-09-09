@@ -9,4 +9,12 @@ import App from "./components/app.tsx";
 
 const appNode = document.getElementById("content");
 
-ReactDOM.render(<App />, appNode);
+const input = (user?) => {
+    if (user === "" || user === undefined) {
+        input(window.prompt("ユーザー名を入力してください", ""));
+    } else {
+        ReactDOM.render(<App user={user}/>, appNode);
+    }
+};
+
+input();

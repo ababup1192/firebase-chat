@@ -27,5 +27,5 @@ $ open http://localhost:8080/webpack-dev-server/
 
 # Build
 ```
-$ npm build
+$ npm run build
 ```

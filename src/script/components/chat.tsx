@@ -4,6 +4,7 @@ import {List} from "immutable";
 import {ActionCreator, Post} from "../actionCreator";
 
 interface ChatProps {
+    user: string;
     action: ActionCreator;
     appEvent: Bacon.Property<Post, List<Post>>;
 }
@@ -26,8 +27,8 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
 
             const textValue = (e.target as HTMLSelectElement).value;
             if (textValue !== "") {
-                this.props.action.postText({
-                    name: "mira",
+                this.props.action.post({
+                    name: this.props.user,
                     content: textValue
                 });
             }
@@ -37,7 +38,7 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
 
     render() {
         const contents = this.state.postLog.map((post, idx) => {
-            return <li key={idx} className={post.name === "mira" ? "right" : "left"}>
+            return <li key={idx} className={post.name === this.props.user ? "right" : "left"}>
                 <p>{post.content}</p>
             </li>;
         });
