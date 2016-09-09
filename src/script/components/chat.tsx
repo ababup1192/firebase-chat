@@ -1,47 +1,52 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
-import * as Immutable from "immutable";
-
-interface Post {
-    name: string;
-    content: string;
-}
+import {List} from "immutable";
+import {ActionCreator, Post} from "../actionCreator";
 
 interface ChatProps {
-    contents: Immutable.List<Post>;
+    action: ActionCreator;
+    appEvent: Bacon.Property<Post, List<Post>>;
 }
 
-export default class Chat extends React.Component<ChatProps, any> {
+export default class Chat extends React.Component<ChatProps, { postLog: List<Post> }> {
     constructor(props) {
         super(props);
+        this.state = { postLog: List<Post>() };
+    }
+
+    public componentDidMount(): void {
+        this.props.appEvent.onValue((newPostLogs: List<Post>) =>
+            this.setState({ postLog: newPostLogs })
+        );
     }
 
     handleKey(e: KeyboardEvent) {
         if (e.which === 13 || e.keyCode === 13) {
             e.preventDefault();
+
+            const textValue = (e.target as HTMLSelectElement).value;
+            if (textValue !== "") {
+                this.props.action.postText({
+                    name: "mira",
+                    content: textValue
+                });
+            }
             (e.target as HTMLSelectElement).value = "";
         }
     }
 
     render() {
-        const contents = this.props.contents.map((post, idx) => {
-            if (post.name === "mira") {
-                return <li key={idx} className="right">
-                    <p>{post.content}</p>
-                </li>;
-            } else {
-                return <li key={idx} className="left">
-                    <p>{post.content}</p>
-                </li>;
-            }
+        const contents = this.state.postLog.map((post, idx) => {
+            return <li key={idx} className={post.name === "mira" ? "right" : "left"}>
+                <p>{post.content}</p>
+            </li>;
         });
 
         const form = <li className="write-new">
             <textarea
                 placeholder="Write your comment here"
                 name="comment"
-                onKeyPress={this.handleKey.bind(this) }
-                ></textarea>
+                onKeyPress={this.handleKey.bind(this) }></textarea>
         </li>;
 
         return <ul className="comment-section">
