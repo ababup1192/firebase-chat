@@ -8,7 +8,10 @@ var config = {
     filename: "bundle.js"
   },
   resolve: {
-    extensions: ["", ".ts", ".js"]
+    extensions: ["", ".ts", ".js"],
+    alias: {
+      'Immutable': path.join(__dirname, 'node_modules/immutable')
+    }
   },
   module: {
     loaders: [
