@@ -1,7 +1,7 @@
 {
-  "name": "typescript-template",
+  "name": "firebase-chat",
   "version": "0.0.1",
-  "description": "typescript simple template",
+  "description": "Firebase sample",
   "main": "index.js",
   "scripts": {
     "start": "webpack-dev-server",
