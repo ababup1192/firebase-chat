@@ -15,22 +15,9 @@ export class ActionCreator {
     private d: Dispatcher;
     private ref: Firebase.database.Reference;
 
-    constructor(dispatcher: Dispatcher) {
+    constructor(dispatcher: Dispatcher, ref: Firebase.database.Reference) {
         this.d = dispatcher;
-
-        const firebaseConfig = {
-            apiKey: "AIzaSyBP9yQTAUGxbq75j4qsBBc_IpYaswIw49M",
-            authDomain: "fir-chat-d38c8.firebaseapp.com",
-            databaseURL: "https://fir-chat-d38c8.firebaseio.com",
-            storageBucket: "fir-chat-d38c8.appspot.com",
-        };
-
-        Firebase.initializeApp(firebaseConfig);
-        this.ref = Firebase.database().ref();
-        this.ref.on("child_added", (ss: Firebase.database.DataSnapshot) => {
-            const post: Post = ss.val();
-            this.innerPost(post);
-        });
+        this.ref = ref;
     }
 
     public post(post: Post): void {
