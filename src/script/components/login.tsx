@@ -3,11 +3,12 @@ import * as ReactDOM from "react-dom";
 import {List, Record} from "immutable";
 import * as Firebase from "firebase";
 
-import Dispatcher from "../dispatcher";
-import {ActionCreator, Post} from "../actionCreator";
+import Dispatcher from "../actionCreators/dispatcher";
+import {LoginAction, UserInfo} from "../actionCreators/loginAction";
 
 interface LoginProps {
     usersRef: Firebase.database.Reference;
+    action: LoginAction;
 }
 
 interface LoginState {
@@ -27,6 +28,16 @@ export default class Login extends React.Component<LoginProps, LoginState> {
     }
 
     private handleClickLogin() {
+        if (this.state.uid !== "") {
+            this.props.action.login({
+                uid: this.state.uid,
+                photoURL: this.state.photoURL,
+                displayName: this.state.displayName
+            });
+        } else {
+            alert("twitterボタンを押して、認証してからクリックしてください。");
+        }
+
     }
 
     private handleName(e: KeyboardEvent) {
@@ -41,18 +52,9 @@ export default class Login extends React.Component<LoginProps, LoginState> {
 
     private handleTwitterAuth() {
         const provider = new Firebase.auth.TwitterAuthProvider();
-        /* Firebase.auth().signOut().then(function () {
-            // Sign-out successful.
-        }, function (error) {
-            // An error happened.
-        });*/
+
         Firebase.auth().signInWithPopup(provider).then((result) => {
             const user = result.user;
-            this.props.usersRef.child(user.uid).set({
-                uid: user.uid,
-                photoURL: user.photoURL,
-                displayName: user.displayName
-            });
             this.setState({
                 uid: user.uid,
                 photoURL: user.photoURL,

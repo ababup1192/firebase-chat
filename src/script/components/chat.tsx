@@ -1,12 +1,12 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {List} from "immutable";
-import {ActionCreator, Post} from "../actionCreator";
+import {ChatAction, Post} from "../actionCreators/chatAction";
 
 interface ChatProps {
     user: string;
-    action: ActionCreator;
-    appEvent: Bacon.Property<Post, List<Post>>;
+    action: ChatAction;
+    event: Bacon.Property<Post, List<Post>>;
 }
 
 export default class Chat extends React.Component<ChatProps, { postLog: List<Post> }> {
@@ -16,7 +16,7 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
     }
 
     public componentDidMount(): void {
-        this.props.appEvent.onValue((newPostLogs: List<Post>) =>
+        this.props.event.onValue((newPostLogs: List<Post>) =>
             this.setState({ postLog: newPostLogs })
         );
     }

@@ -11,7 +11,7 @@ export interface Post {
     content: string;
 }
 
-export class ActionCreator {
+export class ChatAction {
     private d: Dispatcher;
     private ref: Firebase.database.Reference;
 
@@ -35,7 +35,7 @@ export class ActionCreator {
     }
 
     private _post(postLogs: List<Post>, post: Post): List<Post> {
-        this.ref.child("abc").push(post);
+        this.ref.child("chat").push(post);
         return postLogs;
     }
 

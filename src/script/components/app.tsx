@@ -3,46 +3,15 @@ import * as ReactDOM from "react-dom";
 import {List, Record} from "immutable";
 import * as Firebase from "firebase";
 
-import Dispatcher from "../dispatcher";
-import {ActionCreator, Post} from "../actionCreator";
+import Dispatcher from "../actionCreators/dispatcher";
+import {LoginAction, UserInfo} from "../actionCreators/loginAction";
+import {ChatAction, Post} from "../actionCreators/chatAction";
 import Chat from "./chat.tsx";
 import Login from "./login.tsx";
-
 
 interface AppProps {
     user: string;
 }
-/*
-const AppStateRecord = Record({
-    isLogin: false,
-    selectedMenuItem: "Log in",
-    uid: ""
-});
-class AppState extends AppStateRecord {
-
-    private IS_LOGIN = "isLogin";
-    private SELECTED_MENU_ITEM = "selectedMenuItem";
-    private UID = "uid";
-
-    public set(key: string, value: any): AppState {
-        // super.set(key, value);
-        console.log("set");
-        return new AppState();
-    }
-
-    public isLogin(): boolean { return this.get(this.IS_LOGIN); }
-    public selectedMenuItem(): string { return this.get(this.SELECTED_MENU_ITEM); }
-    public uid(): string { return this.get(this.UID); }
-
-    public setIsLogin(isLogin: boolean): AppState { return this.set(this.IS_LOGIN, isLogin); }
-    public setSelectedMenuItem(selectedMenuItem: string): AppState {
-        return this.set(this.SELECTED_MENU_ITEM, selectedMenuItem);
-    }
-    public setUID(uid: string): AppState {
-        return this.set(this.UID, uid);
-    }
-}*/
-
 
 interface AppState {
     isLogin: boolean;
@@ -51,9 +20,10 @@ interface AppState {
 }
 
 export default class App extends React.Component<AppProps, AppState> {
-    private dispatcher: Dispatcher;
-    private action: ActionCreator;
-    private appEvent: Bacon.Property<Post, List<Post>>;
+    private loginAction: LoginAction;
+    private loginEvent: Bacon.Property<UserInfo, UserInfo>;
+    private chatAction: ChatAction;
+    private chatEvent: Bacon.Property<Post, List<Post>>;
     private usersRef: Firebase.database.Reference;
 
     constructor(props) {
@@ -64,7 +34,6 @@ export default class App extends React.Component<AppProps, AppState> {
             uid: ""
         };
 
-        this.dispatcher = new Dispatcher();
         const firebaseConfig = {
             apiKey: "AIzaSyBP9yQTAUGxbq75j4qsBBc_IpYaswIw49M",
             authDomain: "fir-chat-d38c8.firebaseapp.com",
@@ -73,14 +42,27 @@ export default class App extends React.Component<AppProps, AppState> {
         };
         Firebase.initializeApp(firebaseConfig);
         const dbRef = Firebase.database().ref();
-        this.action = new ActionCreator(this.dispatcher, dbRef);
-        this.appEvent = this.action.createProperty();
 
-        dbRef.child("abc").on("child_added", (ss: Firebase.database.DataSnapshot) => {
-            const post: Post = ss.val();
-            this.action.innerPost(post);
-        });
         this.usersRef = dbRef.child("users");
+        this.loginAction = new LoginAction(new Dispatcher(), this.usersRef);
+        this.loginEvent = this.loginAction.createProperty();
+        this.loginAction.createProperty().onValue((userInfo: UserInfo) => {
+            if (userInfo.uid !== "") {
+                this.setState({
+                    isLogin: true,
+                    selectedMenuItem: "Main",
+                    uid: userInfo.uid
+                });
+            }
+        });
+
+        this.chatAction = new ChatAction(new Dispatcher(), dbRef);
+        this.chatEvent = this.chatAction.createProperty();
+
+        dbRef.child("chat").on("child_added", (ss: Firebase.database.DataSnapshot) => {
+            const post: Post = ss.val();
+            this.chatAction.innerPost(post);
+        });
     }
 
     private handleClick(isLogin, selectedMenuItem) {
@@ -99,18 +81,23 @@ export default class App extends React.Component<AppProps, AppState> {
         this.handleClick(true, "Settings");
     }
 
-
-
     private handleClickLogout() {
-        this.handleClick(false, "Log in");
+        if (confirm("ログアウトして、よろしいですか？")) {
+            this.usersRef.child(Firebase.auth().currentUser.uid).remove();
+            Firebase.auth().signOut().then(() => { }
+                , function (error) {
+                    console.error(error);
+                });
+            this.handleClick(false, "Log in");
+        }
     }
 
-    private selectedItem(itemName): string {
+    private selectedMenuItem(itemName): string {
         return itemName === this.state.selectedMenuItem ? "is-site-header-item-selected" : "";
     }
 
     private showLeftMenu(): JSX.Element {
-        const MAIN_CLASS = `siteHeader__item siteHeaderButton ${this.selectedItem("Main")}`;
+        const MAIN_CLASS = `siteHeader__item siteHeaderButton ${this.selectedMenuItem("Main")}`;
         if (this.state.isLogin) {
             return <div className="siteHeader__section">
                 <div
@@ -124,7 +111,7 @@ export default class App extends React.Component<AppProps, AppState> {
     }
 
     private showRightMenu(): JSX.Element {
-        const SETTINGS_CLASS = `siteHeader__item siteHeaderButton ${this.selectedItem("Settings")}`;
+        const SETTINGS_CLASS = `siteHeader__item siteHeaderButton ${this.selectedMenuItem("Settings")}`;
 
         if (this.state.isLogin) {
             return <div className="siteHeader__section">
@@ -149,9 +136,9 @@ export default class App extends React.Component<AppProps, AppState> {
 
     private showContents(): JSX.Element {
         if (this.state.isLogin) {
-            return <Chat user={this.props.user} action={this.action} appEvent={this.appEvent}/>;
+            return <Chat user={this.props.user} action={this.chatAction} event={this.chatEvent}/>;
         } else {
-            return <Login usersRef={this.usersRef} />;
+            return <Login usersRef={this.usersRef} action={this.loginAction}  />;
         }
     }
 
