@@ -55,6 +55,8 @@ export default class Login extends React.Component<LoginProps, LoginState> {
 
         Firebase.auth().signInWithPopup(provider).then((result) => {
             const user = result.user;
+            sessionStorage.setItem("token", result.credential["accessToken"]);
+
             this.setState({
                 uid: user.uid,
                 photoURL: user.photoURL,

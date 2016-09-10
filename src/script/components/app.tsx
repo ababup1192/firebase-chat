@@ -17,6 +17,8 @@ interface AppState {
     isLogin: boolean;
     selectedMenuItem: string;
     uid: string;
+    photoURL: string;
+    displayName: string;
 }
 
 export default class App extends React.Component<AppProps, AppState> {
@@ -24,15 +26,11 @@ export default class App extends React.Component<AppProps, AppState> {
     private loginEvent: Bacon.Property<UserInfo, UserInfo>;
     private chatAction: ChatAction;
     private chatEvent: Bacon.Property<Post, List<Post>>;
+    private chatRef: Firebase.database.Reference;
     private usersRef: Firebase.database.Reference;
 
     constructor(props) {
         super(props);
-        this.state = {
-            isLogin: false,
-            selectedMenuItem: "Log in",
-            uid: ""
-        };
 
         const firebaseConfig = {
             apiKey: "AIzaSyBP9yQTAUGxbq75j4qsBBc_IpYaswIw49M",
@@ -43,6 +41,16 @@ export default class App extends React.Component<AppProps, AppState> {
         Firebase.initializeApp(firebaseConfig);
         const dbRef = Firebase.database().ref();
 
+        const token: string = sessionStorage.getItem("token");
+
+        this.state = {
+            isLogin: false,
+            selectedMenuItem: "Log in",
+            uid: "",
+            displayName: "",
+            photoURL: ""
+        };
+
         this.usersRef = dbRef.child("users");
         this.loginAction = new LoginAction(new Dispatcher(), this.usersRef);
         this.loginEvent = this.loginAction.createProperty();
@@ -51,25 +59,26 @@ export default class App extends React.Component<AppProps, AppState> {
                 this.setState({
                     isLogin: true,
                     selectedMenuItem: "Main",
-                    uid: userInfo.uid
+                    uid: userInfo.uid,
+                    displayName: userInfo.displayName,
+                    photoURL: userInfo.photoURL
                 });
             }
         });
 
         this.chatAction = new ChatAction(new Dispatcher(), dbRef);
         this.chatEvent = this.chatAction.createProperty();
-
-        dbRef.child("chat").on("child_added", (ss: Firebase.database.DataSnapshot) => {
-            const post: Post = ss.val();
-            this.chatAction.innerPost(post);
-        });
+        this.chatRef = dbRef.child("chat");
     }
 
     private handleClick(isLogin, selectedMenuItem) {
+        this.chatAction.reset();
         this.setState({
             isLogin: isLogin,
             selectedMenuItem: selectedMenuItem,
-            uid: this.state.uid
+            uid: this.state.uid,
+            displayName: this.state.displayName,
+            photoURL: this.state.photoURL
         });
     }
 
@@ -119,10 +128,10 @@ export default class App extends React.Component<AppProps, AppState> {
                     className={SETTINGS_CLASS}
                     onClick={this.handleClickSettings.bind(this) }
                     >Settings</div>
-                <div
-                    className="siteHeader__item siteHeaderButton"
-                    onClick={this.handleClickLogout.bind(this) }>
-                    Log out
+                <div className="siteHeader__item siteHeaderButton">
+                    <img src={ this.state.photoURL }
+                        className="siteHeader__item siteHeaderButton"
+                        onClick={this.handleClickLogout.bind(this) } />
                 </div>
             </div>;
         } else {
@@ -136,7 +145,17 @@ export default class App extends React.Component<AppProps, AppState> {
 
     private showContents(): JSX.Element {
         if (this.state.isLogin) {
-            return <Chat user={this.props.user} action={this.chatAction} event={this.chatEvent}/>;
+            switch (this.state.selectedMenuItem) {
+                case "Main":
+                    return <Chat
+                        user={this.props.user}
+                        action={this.chatAction}
+                        event={this.chatEvent}
+                        chatRef={this.chatRef}/>;
+                case "Settings":
+                    return <p>Settings</p>;
+            }
+
         } else {
             return <Login usersRef={this.usersRef} action={this.loginAction}  />;
         }
