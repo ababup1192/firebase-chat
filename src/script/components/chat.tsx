@@ -21,8 +21,14 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
         );
     }
 
+    public componentDidUpdate(): void {
+        const chatMain = ReactDOM.findDOMNode(this.refs["chat-main"]) as HTMLLIElement;
+        chatMain.scrollTop = chatMain.scrollHeight;
+    }
+
     handleKey(e: KeyboardEvent) {
-        if (e.which === 13 || e.keyCode === 13) {
+        console.log(e.shiftKey);
+        if ((e.which === 13 || e.keyCode === 13) && !e.shiftKey) {
             e.preventDefault();
 
             const textValue = (e.target as HTMLSelectElement).value;
@@ -39,7 +45,9 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
     render() {
         const contents = this.state.postLog.map((post, idx) => {
             return <li key={idx} className={post.name === this.props.user ? "right" : "left"}>
-                <p>{post.content}</p>
+                {post.content.split("\n").map((line) =>
+                    <p>{line}</p>
+                ) }
             </li>;
         });
 
@@ -51,7 +59,9 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
         </li>;
 
         return <ul className="comment-section">
-            {contents}
+            <ul className="chat-main" ref="chat-main">
+                {contents}
+            </ul>
             {form}
         </ul>;
     }

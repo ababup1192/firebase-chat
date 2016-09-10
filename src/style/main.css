@@ -1,14 +1,63 @@
 @import url(~sanitize.css/sanitize.css);
 
+@import url(./headerMenu.css);
+
+.loginForm {
+    width: 300px;
+}
+
+.loginForm input[type="button"]{
+    background-color: green;
+    color: white;
+    border: 2px solid blue;
+}
+
+.InputAddOn {
+  display: flex;
+  margin-bottom: 1.5em;
+}
+
+.InputAddOn-field {
+  flex: 1;
+}
+
+.InputAddOn-field:not(:first-child) {
+  border-left: 0;
+}
+.InputAddOn-field:not(:last-child) {
+  border-right: 0;
+}
+
+.InputAddOn-item {
+  background-color: rgba(147, 128, 108, 0.1);
+  color: #666666;
+  font: inherit;
+  font-weight: normal;
+}
+
+.InputAddOn-field,
+.InputAddOn-item {
+  border: 1px solid rgba(147, 128, 108, 0.25);
+  padding: 0.5em 0.75em;
+}
+.InputAddOn-field:first-child,
+.InputAddOn-item:first-child {
+  border-radius: 2px 0 0 2px;
+}
+.InputAddOn-field:last-child,
+.InputAddOn-item:last-child {
+  border-radius: 0 2px 2px 0;
+}
+
 .left {
     display: flex;
     justify-content: flex-start;
-    margin: 10px;
+    margin: 5px;
     border-radius: 5px;
     background: #60B99A;
     color: #fff;
     display: block;
-    padding: 15px;
+    padding: 5px;
     padding-left: 50;
     text-decoration: none;
 }
@@ -26,12 +75,28 @@
     text-decoration: none;
 }
 
+.left p {
+    padding: 0px;
+    margin: 0px;
+}
+
+.right p {
+    padding: 0px;
+    margin: 0px;
+}
+
 .comment-section {
     list-style: none;
     max-width: 800px;
     width: 100%;
     margin: 50px auto;
     padding: 10px;
+}
+
+.chat-main {
+    height: 450px;
+    overflow-y: auto;
+    word-break: break-all;
 }
 
 .write-new {

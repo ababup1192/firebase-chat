@@ -35,7 +35,7 @@ export class ActionCreator {
     }
 
     private _post(postLogs: List<Post>, post: Post): List<Post> {
-        this.ref.push(post);
+        this.ref.child("abc").push(post);
         return postLogs;
     }
 
