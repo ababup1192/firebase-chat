@@ -9,10 +9,6 @@ import {ChatAction, Post} from "../actionCreators/chatAction";
 import Chat from "./chat.tsx";
 import Login from "./login.tsx";
 
-interface AppProps {
-    user: string;
-}
-
 interface AppState {
     isLogin: boolean;
     selectedMenuItem: string;
@@ -21,7 +17,7 @@ interface AppState {
     displayName: string;
 }
 
-export default class App extends React.Component<AppProps, AppState> {
+export default class App extends React.Component<any, AppState> {
     private loginAction: LoginAction;
     private loginEvent: Bacon.Property<UserInfo, UserInfo>;
     private chatAction: ChatAction;
@@ -32,16 +28,7 @@ export default class App extends React.Component<AppProps, AppState> {
     constructor(props) {
         super(props);
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyBP9yQTAUGxbq75j4qsBBc_IpYaswIw49M",
-            authDomain: "fir-chat-d38c8.firebaseapp.com",
-            databaseURL: "https://fir-chat-d38c8.firebaseio.com",
-            storageBucket: "fir-chat-d38c8.appspot.com",
-        };
-        Firebase.initializeApp(firebaseConfig);
         const dbRef = Firebase.database().ref();
-
-        const token: string = sessionStorage.getItem("token");
 
         this.state = {
             isLogin: false,
@@ -69,6 +56,12 @@ export default class App extends React.Component<AppProps, AppState> {
         this.chatAction = new ChatAction(new Dispatcher(), dbRef);
         this.chatEvent = this.chatAction.createProperty();
         this.chatRef = dbRef.child("chat");
+    }
+
+    public componentDidUpdate(): void {
+
+        if (this.state.isLogin) {
+        }
     }
 
     private handleClick(isLogin, selectedMenuItem) {
@@ -148,10 +141,13 @@ export default class App extends React.Component<AppProps, AppState> {
             switch (this.state.selectedMenuItem) {
                 case "Main":
                     return <Chat
-                        user={this.props.user}
+                        uid={this.state.uid}
+                        displayName={this.state.displayName}
                         action={this.chatAction}
                         event={this.chatEvent}
-                        chatRef={this.chatRef}/>;
+                        chatRef={this.chatRef}
+                        usersRef={this.usersRef}
+                        />;
                 case "Settings":
                     return <p>Settings</p>;
             }

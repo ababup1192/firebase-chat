@@ -52,26 +52,24 @@
 .left {
     display: flex;
     justify-content: flex-start;
-    margin: 5px;
+    margin: 2px;
+    padding: 2px 25px;
     border-radius: 5px;
     background: #60B99A;
     color: #fff;
     display: block;
-    padding: 5px;
-    padding-left: 50;
     text-decoration: none;
 }
 
 .right {
     display: flex;
     justify-content: flex-end;
-    margin: 10px;
+    margin: 2px;
+    padding: 2px 25px;
     border-radius: 5px;
     background: grey;
     color: #fff;
     display: block;
-    padding: 15px;
-    padding-left: 50;
     text-decoration: none;
 }
 
@@ -87,7 +85,7 @@
 
 .comment-section {
     list-style: none;
-    max-width: 800px;
+    max-width: 500px;
     width: 100%;
     margin: 50px auto;
     padding: 10px;

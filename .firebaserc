@@ -1,1 +1,5 @@
-{}
+{
+  "projects": {
+    "chat": "fir-chat-d38c8"
+  }
+}

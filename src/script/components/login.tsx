@@ -23,7 +23,7 @@ export default class Login extends React.Component<LoginProps, LoginState> {
         this.state = {
             uid: "",
             photoURL: "",
-            displayName: ""
+            displayName: "",
         };
     }
 
@@ -46,7 +46,7 @@ export default class Login extends React.Component<LoginProps, LoginState> {
         this.setState({
             uid: this.state.uid,
             photoURL: this.state.photoURL,
-            displayName: textValue
+            displayName: textValue,
         });
     }
 
@@ -55,8 +55,6 @@ export default class Login extends React.Component<LoginProps, LoginState> {
 
         Firebase.auth().signInWithPopup(provider).then((result) => {
             const user = result.user;
-            sessionStorage.setItem("token", result.credential["accessToken"]);
-
             this.setState({
                 uid: user.uid,
                 photoURL: user.photoURL,

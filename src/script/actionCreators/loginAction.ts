@@ -24,7 +24,7 @@ export class LoginAction {
     }
 
     public createProperty(): Bacon.Property<UserInfo, UserInfo> {
-        return Bacon.update<UserInfo, UserInfo, UserInfo>({ uid: "", photoURL: "", displayName: "" },
+        return Bacon.update<UserInfo, UserInfo, UserInfo>({ uid: "", photoURL: "", displayName: ""},
             [this.d.stream(LOGIN)], this._login.bind(this)
         );
     }
@@ -37,7 +37,6 @@ export class LoginAction {
                 displayName: newUserInfo.displayName
             });
         }
-
         return newUserInfo;
     }
 

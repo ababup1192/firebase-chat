@@ -8,6 +8,7 @@ const INNER_POST = "INNER_POST";
 const RESET = "RESET";
 
 export interface Post {
+    uid: string;
     name: string;
     content: string;
 }

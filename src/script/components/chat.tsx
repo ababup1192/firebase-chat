@@ -1,22 +1,29 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as Firebase from "firebase";
-import {List} from "immutable";
+import {List, Map} from "immutable";
 import {ChatAction, Post} from "../actionCreators/chatAction";
 
 interface ChatProps {
-    user: string;
+    uid: string;
+    displayName: string,
     action: ChatAction;
     event: Bacon.Property<Post, List<Post>>;
+    usersRef: Firebase.database.Reference;
     chatRef: Firebase.database.Reference;
 }
 
-export default class Chat extends React.Component<ChatProps, { postLog: List<Post> }> {
+interface ChatState {
+    usersList: List<string>;
+    postLog: List<Post>;
+}
+
+export default class Chat extends React.Component<ChatProps, ChatState> {
     private isMount: boolean;
 
     constructor(props) {
         super(props);
-        this.state = { postLog: List<Post>() };
+        this.state = { usersList: List<string>(), postLog: List<Post>() };
 
         this.isMount = false;
     }
@@ -24,9 +31,12 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
     public componentWillMount(): void {
         this.isMount = true;
 
+        this.props.usersRef.remove();
+        setInterval(() => this.props.usersRef.remove(), 20 * 1000);
+
         this.props.event.onValue((newPostLogs: List<Post>) => {
             if (this.isMount) {
-                this.setState({ postLog: newPostLogs });
+                this.setState({ usersList: this.state.usersList, postLog: newPostLogs });
             }
         });
 
@@ -36,6 +46,29 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
                 this.props.action.innerPost(post);
             }
         });
+
+        this.props.usersRef.on("value", (ss: Firebase.database.DataSnapshot) => {
+            const currentUser = Firebase.auth().currentUser;
+            this.props.usersRef.child(currentUser.uid).once("value", (snapShot) => {
+                if (snapShot.val() === null) {
+                    this.props.usersRef.child(currentUser.uid).set({
+                        uid: currentUser.uid,
+                        displayName: currentUser.displayName,
+                        photoURL: currentUser.photoURL
+                    });
+                }
+            });
+
+            if (ss.val()) {
+                setTimeout(() =>
+                    this.props.usersRef.once("value", function(snapShot){
+                        const value = snapShot.val();
+                        const users = List(Object.keys(value).map((key, idx) => value[key].displayName).sort());
+                        this.setState({ usersList: users, postLog: this.state.postLog });
+                    }.bind(this)), 2 * 1000);
+            }
+        });
+
     }
 
     public componentWillUnmount(): void {
@@ -54,7 +87,8 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
             const textValue = (e.target as HTMLSelectElement).value;
             if (textValue !== "") {
                 this.props.action.post({
-                    name: this.props.user,
+                    uid: this.props.uid,
+                    name: this.props.displayName,
                     content: textValue
                 });
             }
@@ -63,8 +97,12 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
     }
 
     render() {
+        const usersList = this.state.usersList.map((user, idx) =>
+            <li key={`users-${idx}`}>{user}</li>
+        );
         const contents = this.state.postLog.map((post, lidx) => {
-            return <li key={`chat-line-${lidx}`} className={post.name === this.props.user ? "right" : "left"}>
+            return <li key={`chat-line-${lidx}`} className={post.uid === this.props.uid ? "right" : "left"}>
+                <p key={`chat-line-${lidx}-header`}>{`${post.name} :`}</p>
                 {post.content.split("\n").map((line, pidx) =>
                     <p key={`chat-line-${lidx}-p-${pidx}`}>{line}</p>
                 ) }
@@ -78,11 +116,16 @@ export default class Chat extends React.Component<ChatProps, { postLog: List<Pos
                 onKeyPress={this.handleKey.bind(this) }></textarea>
         </li>;
 
-        return <ul className="comment-section">
-            <ul className="chat-main" ref="chat-main">
-                {contents}
+        return <div className="chat-container">
+            <ul className="users-list">
+                {usersList}
             </ul>
-            {form}
-        </ul>;
+            <ul className="comment-section">
+                <ul className="chat-main" ref="chat-main">
+                    {contents}
+                </ul>
+                {form}
+            </ul>
+        </div>;
     }
 }
