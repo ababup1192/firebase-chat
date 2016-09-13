@@ -4,8 +4,8 @@ import {List, Record} from "immutable";
 import * as Firebase from "firebase";
 
 import Dispatcher from "../actionCreators/dispatcher";
-import {LoginAction, UserInfo} from "../actionCreators/loginAction";
-import {ChatAction, Post} from "../actionCreators/chatAction";
+import {LoginAction, IUserInfo} from "../actionCreators/loginAction";
+import {ChatAction, IMessage} from "../actionCreators/chatAction";
 import Chat from "./chat.tsx";
 import Login from "./login.tsx";
 
@@ -19,16 +19,12 @@ interface AppState {
 
 export default class App extends React.Component<any, AppState> {
     private loginAction: LoginAction;
-    private loginEvent: Bacon.Property<UserInfo, UserInfo>;
-    private chatAction: ChatAction;
-    private chatEvent: Bacon.Property<Post, List<Post>>;
-    private chatRef: Firebase.database.Reference;
+    private loginEvent: Bacon.Property<IUserInfo, List<IUserInfo>>;
+    private dbRef: Firebase.database.Reference;
     private usersRef: Firebase.database.Reference;
 
     constructor(props) {
         super(props);
-
-        const dbRef = Firebase.database().ref();
 
         this.state = {
             isLogin: false,
@@ -38,24 +34,24 @@ export default class App extends React.Component<any, AppState> {
             photoURL: ""
         };
 
-        this.usersRef = dbRef.child("users");
+        this.dbRef = Firebase.database().ref();
+        this.usersRef = this.dbRef.child("users");
         this.loginAction = new LoginAction(new Dispatcher(), this.usersRef);
         this.loginEvent = this.loginAction.createProperty();
-        this.loginAction.createProperty().onValue((userInfo: UserInfo) => {
-            if (userInfo.uid !== "") {
+
+        this.loginEvent.onValue(() => {
+            const user = Firebase.auth().currentUser;
+            if (user && this.state.isLogin === false) {
                 this.setState({
                     isLogin: true,
                     selectedMenuItem: "Main",
-                    uid: userInfo.uid,
-                    displayName: userInfo.displayName,
-                    photoURL: userInfo.photoURL
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL
                 });
+
             }
         });
-
-        this.chatAction = new ChatAction(new Dispatcher(), dbRef);
-        this.chatEvent = this.chatAction.createProperty();
-        this.chatRef = dbRef.child("chat");
     }
 
     public componentDidUpdate(): void {
@@ -65,7 +61,6 @@ export default class App extends React.Component<any, AppState> {
     }
 
     private handleClick(isLogin, selectedMenuItem) {
-        this.chatAction.reset();
         this.setState({
             isLogin: isLogin,
             selectedMenuItem: selectedMenuItem,
@@ -143,10 +138,10 @@ export default class App extends React.Component<any, AppState> {
                     return <Chat
                         uid={this.state.uid}
                         displayName={this.state.displayName}
-                        action={this.chatAction}
-                        event={this.chatEvent}
-                        chatRef={this.chatRef}
                         usersRef={this.usersRef}
+                        loginAction={this.loginAction}
+                        loginEvent={this.loginEvent}
+                        chatRef={this.dbRef.child("chat") }
                         />;
                 case "Settings":
                     return <p>Settings</p>;

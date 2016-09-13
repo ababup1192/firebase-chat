@@ -1,10 +1,12 @@
 import * as Bacon from "baconjs";
 import Dispatcher from "./dispatcher";
 import * as Firebase from "firebase";
+import {List} from "immutable";
 
 const LOGIN = "LOGIN";
+const INNER_LOGIN = "INNER_LOGIN";
 
-export interface UserInfo {
+export interface IUserInfo {
     uid: string;
     photoURL: string;
     displayName: string;
@@ -19,25 +21,36 @@ export class LoginAction {
         this.usersRef = userRef;
     }
 
-    public login(userInfo: UserInfo): void {
+    public login(userInfo: IUserInfo): void {
         this.d.push(LOGIN, userInfo);
     }
 
-    public createProperty(): Bacon.Property<UserInfo, UserInfo> {
-        return Bacon.update<UserInfo, UserInfo, UserInfo>({ uid: "", photoURL: "", displayName: ""},
-            [this.d.stream(LOGIN)], this._login.bind(this)
+    public innerLogin(userInfoList: List<IUserInfo>): void {
+        this.d.push(INNER_LOGIN, userInfoList);
+    }
+
+    public createProperty(): Bacon.Property<IUserInfo, List<IUserInfo>> {
+        return Bacon.update<IUserInfo, IUserInfo, List<IUserInfo>, List<IUserInfo>>(List<IUserInfo>(),
+            [this.d.stream(LOGIN)], this._login.bind(this),
+            [this.d.stream(INNER_LOGIN)], this._innerLogin.bind(this)
         );
     }
 
-    private _login(old: UserInfo, newUserInfo: UserInfo): UserInfo {
+    private _login(userInfoList: List<IUserInfo>, newUserInfo: IUserInfo): List<IUserInfo> {
         if (newUserInfo.uid !== "") {
             this.usersRef.child(newUserInfo.uid).set({
                 uid: newUserInfo.uid,
                 photoURL: newUserInfo.photoURL,
                 displayName: newUserInfo.displayName
             });
+            return userInfoList.find((userInfo) => userInfo.uid === newUserInfo.uid)
+                ? userInfoList : userInfoList.push(newUserInfo);
+        } else {
+            return userInfoList;
         }
-        return newUserInfo;
     }
 
+    private _innerLogin(old: List<IUserInfo>, newUserInfoList: List<IUserInfo>): List<IUserInfo> {
+        return newUserInfoList;
+    }
 }

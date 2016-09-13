@@ -4,7 +4,7 @@ import {List, Record} from "immutable";
 import * as Firebase from "firebase";
 
 import Dispatcher from "../actionCreators/dispatcher";
-import {LoginAction, UserInfo} from "../actionCreators/loginAction";
+import {LoginAction} from "../actionCreators/loginAction";
 
 interface LoginProps {
     usersRef: Firebase.database.Reference;
