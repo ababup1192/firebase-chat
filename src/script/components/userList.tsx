@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as Firebase from "firebase";
-import {List, Map} from "immutable";
+import {List, Map, Record} from "immutable";
 import {IUserInfo, LoginAction} from "../actionCreators/loginAction";
 
 interface IUserList {
@@ -30,45 +30,67 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         this.state = { userList: List<IUserList>() };
     }
 
-
-    public componentWillMount() {
-        this.isMount = true;
-
-        // ログインユーザリスト更新処理
+    // ログインユーザリストを状態に反映(イベント更新を待ち受ける)
+    private updateStateUserList() {
         this.props.loginEvent.onValue((newUserList: List<IUserInfo>) => {
+            // ComponentがUnmountされたら状態の反映をストップ
             if (this.isMount) {
                 this.setState({ userList: newUserList });
             }
         });
+    }
 
-        // 10秒毎にユーザリストを更新(一旦ログインユーザ斉削除)
+    // 10秒間隔でログインユーザリストを削除
+    private removeUserListRepetedly() {
         this.props.usersRef.remove();
         setInterval(() => this.props.usersRef.remove(), 10 * 1000);
+    }
+
+    // Firebaseに現在のログインユーザ情報を保存
+    private saveCurrentUserInfo() {
+        const currentUser = Firebase.auth().currentUser;
+        this.props.usersRef.child(currentUser.uid).once("value", (snapShot) => {
+            if (snapShot.val() === null) {
+                this.props.usersRef.child(currentUser.uid).set({
+                    uid: currentUser.uid,
+                    displayName: currentUser.displayName,
+                    photoURL: currentUser.photoURL
+                });
+            }
+        });
+    }
+
+    // 更新されたユーザリストをイベントに伝搬(ユーザリストが完全に更新されるまで、二秒待つ)
+    private notifyUpdatedUserList() {
+        setTimeout(() =>
+            this.props.usersRef.once("value", function (snapShot) {
+                const userListObject = snapShot.val();
+                const users = List(Object.keys(userListObject).map((key) => userListObject[key]));
+                this.props.loginAction.innerLogin(users);
+            }.bind(this))
+            , 2 * 1000);
+    }
+
+    // 10秒間隔でログインユーザリストを更新
+    private refleshUserList() {
+        this.updateStateUserList();
+        this.removeUserListRepetedly();
 
         // FirebaseからUsersを読み込む(ログインユーザが削除・変更されたとき)
         this.props.usersRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
-            const currentUser = Firebase.auth().currentUser;
-            // 自分のログイン情報をFirebaseに書き込む
-            this.props.usersRef.child(currentUser.uid).once("value", (snapShot) => {
-                if (snapShot.val() === null) {
-                    this.props.usersRef.child(currentUser.uid).set({
-                        uid: currentUser.uid,
-                        displayName: currentUser.displayName,
-                        photoURL: currentUser.photoURL
-                    });
-                }
-            });
+            this.saveCurrentUserInfo();
 
+            // 更新された情報が空出なければ、更新情報をイベントに伝搬
             if (snapShot.val()) {
-                // ログイン情報が全部書き込まれてから(画面のチラつき防止)ユーザリストを更新
-                setTimeout(() =>
-                    this.props.usersRef.once("value", function (snapShot) {
-                        const value = snapShot.val();
-                        const users = List(Object.keys(value).map((key, idx) => value[key]));
-                        this.props.loginAction.innerLogin(users);
-                    }.bind(this)), 2 * 1000);
+                this.notifyUpdatedUserList();
             }
         });
+    }
+
+    public componentWillMount() {
+        this.isMount = true;
+
+        this.refleshUserList();
     }
 
     public componentWillUnmount() {

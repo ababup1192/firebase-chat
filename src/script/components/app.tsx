@@ -49,7 +49,6 @@ export default class App extends React.Component<any, AppState> {
                     displayName: user.displayName,
                     photoURL: user.photoURL
                 });
-
             }
         });
     }
