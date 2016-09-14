@@ -47,14 +47,13 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
     }
 
     // Firebaseに現在のログインユーザ情報を保存
-    private saveCurrentUserInfo() {
-        const currentUser = Firebase.auth().currentUser;
-        this.props.usersRef.child(currentUser.uid).once("value", (snapShot) => {
+    private saveCurrentUserInfo(user: Firebase.User) {
+        this.props.usersRef.child(user.uid).once("value", (snapShot) => {
             if (snapShot.val() === null) {
-                this.props.usersRef.child(currentUser.uid).set({
-                    uid: currentUser.uid,
-                    displayName: currentUser.displayName,
-                    photoURL: currentUser.photoURL
+                this.props.usersRef.child(user.uid).set({
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL
                 });
             }
         });
@@ -65,26 +64,31 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         setTimeout(() =>
             this.props.usersRef.once("value", function (snapShot) {
                 const userListObject = snapShot.val();
-                const users = List(Object.keys(userListObject).map((key) => userListObject[key]));
-                this.props.loginAction.innerLogin(users);
+                if (userListObject) {
+                    const users = List(Object.keys(userListObject).map((key) => userListObject[key]));
+                    this.props.loginAction.innerLogin(users);
+                }
             }.bind(this))
             , 2 * 1000);
     }
 
     // 10秒間隔でログインユーザリストを更新
     private refleshUserList() {
-        this.updateStateUserList();
-        this.removeUserListRepetedly();
+        const currentUser = Firebase.auth().currentUser;
+        if (currentUser) {
+            this.updateStateUserList();
+            this.removeUserListRepetedly();
 
-        // FirebaseからUsersを読み込む(ログインユーザが削除・変更されたとき)
-        this.props.usersRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
-            this.saveCurrentUserInfo();
+            // FirebaseからUsersを読み込む(ログインユーザが削除・変更されたとき)
+            this.props.usersRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
+                this.saveCurrentUserInfo(currentUser);
 
-            // 更新された情報が空出なければ、更新情報をイベントに伝搬
-            if (snapShot.val()) {
-                this.notifyUpdatedUserList();
-            }
-        });
+                // 更新された情報が空出なければ、更新情報をイベントに伝搬
+                if (snapShot.val()) {
+                    this.notifyUpdatedUserList();
+                }
+            });
+        }
     }
 
     public componentWillMount() {
