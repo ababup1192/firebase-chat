@@ -7,6 +7,7 @@ import {IUserInfo, LoginAction} from "../actionCreators/loginAction";
 interface IUserList {
     uid: string;
     displayName: string;
+    photoURL: string;
 }
 
 interface UsersListProps {
@@ -105,7 +106,12 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         return <ul className="users-list">
             {
                 this.state.userList.map((user, idx) =>
-                    <li key={`users-${idx}`}>{user.displayName}</li>
+                    <li key={`users-${idx}`}>
+                        <div className="userinfo">
+                            <img src={ user.photoURL } />
+                            <p>{user.displayName}</p>
+                        </div>
+                    </li>
                 )
             }
         </ul>;
