@@ -1,44 +1,43 @@
-.left {
-    display: flex;
-    justify-content: flex-start;
-    margin: 2px;
-    padding: 2px 25px;
-    border-radius: 5px;
-    background: #60B99A;
-    color: #fff;
-    display: block;
-    text-decoration: none;
-}
-
-.right {
-    display: flex;
-    justify-content: flex-end;
-    margin: 2px;
-    padding: 2px 25px;
-    border-radius: 5px;
-    background: grey;
-    color: #fff;
-    display: block;
-    text-decoration: none;
-}
-
-.left p {
-    padding: 0px;
-    margin: 0px;
-}
-
-.right p {
-    padding: 0px;
-    margin: 0px;
-}
-
 .chat-container {
     display: flex;
-    padding: 30px 80px;
+    padding: 30px 50px;
 }
 
-.userlist {
-    width: 100px;
+ul.users-list {
+    width: 300px;
+    padding: 0px;
+    margin: 0px;
+    list-style: none;
+    background: whitesmoke;
+    overflow-y: auto;
+    word-break: break-all;
+}
+
+ul.users-list li {
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+
+    list-style-type:none !important;
+	list-style-image:none !important;
+}
+
+.userinfo {
+    padding: 15px;
+    display: flex;
+    flex-direction: row;
+}
+
+.userinfo:hover {
+    padding: 15px;
+    display: flex;
+    flex-direction: row;
+    background: lightgray;
+}
+
+.userinfo p {
+    margin-left: 5px;
+    font-size: small;
 }
 
 .message-area {
@@ -55,6 +54,41 @@
     overflow-y: auto;
     word-break: break-all;
 }
+
+.message-me {
+    display: flex;
+    justify-content: flex-end;
+    margin: 2px;
+    padding: 5px 20px;
+    border-radius: 5px;
+    background: grey;
+    color: #fff;
+    display: block;
+    text-decoration: none;
+}
+
+.message-other {
+    display: flex;
+    justify-content: flex-start;
+    margin: 2px;
+    padding: 5px 20px;
+    border-radius: 5px;
+    background: #60B99A;
+    color: #fff;
+    display: block;
+    text-decoration: none;
+}
+
+.message-me p {
+    padding: 0px;
+    margin: 0px;
+}
+
+.message-other p {
+    padding: 0px;
+    margin: 0px;
+}
+
 
 .message-form {
     flex: 1;
