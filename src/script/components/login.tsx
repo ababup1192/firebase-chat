@@ -8,7 +8,7 @@ import {LoginAction} from "../actionCreators/loginAction";
 
 interface LoginProps {
     usersRef: Firebase.database.Reference;
-    action: LoginAction;
+    loginAction: LoginAction;
 }
 
 interface LoginState {
@@ -29,11 +29,11 @@ export default class Login extends React.Component<LoginProps, LoginState> {
 
     private handleClickLogin() {
         if (this.state.uid !== "") {
-            this.props.action.login({
-                uid: this.state.uid,
-                photoURL: this.state.photoURL,
-                displayName: this.state.displayName
-            });
+                this.props.loginAction.login({
+                    uid: this.state.uid,
+                    photoURL: this.state.photoURL,
+                    displayName: this.state.displayName
+                });
         } else {
             alert("twitterボタンを押して、認証してからクリックしてください。");
         }

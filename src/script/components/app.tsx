@@ -4,7 +4,8 @@ import {List, Record} from "immutable";
 import * as Firebase from "firebase";
 
 import Dispatcher from "../actionCreators/dispatcher";
-import {LoginAction, IUserInfo} from "../actionCreators/loginAction";
+import {LoginAction} from "../actionCreators/LoginAction";
+import {TwitterLoginAction, IUserInfo} from "../actionCreators/twitterLoginAction";
 import {ChatAction, IMessage} from "../actionCreators/chatAction";
 import {HeaderAction, IItemInfo} from "../actionCreators/headerAction";
 import NoLoggedInHeader from "./noLoggedInHeader.tsx";
@@ -21,12 +22,15 @@ interface AppState {
 }
 
 export default class App extends React.Component<any, AppState> {
+    private twitterLoginAction: TwitterLoginAction;
+    private twitterLoginEvent: Bacon.Property<IUserInfo, List<IUserInfo>>;
     private loginAction: LoginAction;
-    private loginEvent: Bacon.Property<IUserInfo, List<IUserInfo>>;
+    private loginEvent: Bacon.Property<IUserInfo, IUserInfo>;
     private headerAction: HeaderAction;
     private headerEvent: Bacon.Property<IItemInfo, IItemInfo>;
     private dbRef: Firebase.database.Reference;
     private usersRef: Firebase.database.Reference;
+    private isMount: boolean;
 
     constructor(props) {
         super(props);
@@ -41,16 +45,25 @@ export default class App extends React.Component<any, AppState> {
 
         this.dbRef = Firebase.database().ref();
         this.usersRef = this.dbRef.child("users");
-        this.loginAction = new LoginAction(new Dispatcher(), this.usersRef);
+        this.twitterLoginAction = new TwitterLoginAction(new Dispatcher(), this.usersRef);
+        this.twitterLoginEvent = this.twitterLoginAction.createProperty();
+        this.loginAction = new LoginAction(new Dispatcher());
         this.loginEvent = this.loginAction.createProperty();
         this.headerAction = new HeaderAction(new Dispatcher());
         this.headerEvent = this.headerAction.createProperty();
+        this.isMount = false;
     }
 
     private componentDidMount() {
-        this.loginEvent.onValue(() => {
-            const user = Firebase.auth().currentUser;
-            if (user && this.state.isLogin === false) {
+        this.isMount = true;
+
+        this.loginEvent.onValue((user) => {
+            if (Firebase.auth().currentUser && this.isMount) {
+                this.usersRef.child(user.uid).set({
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    photoURL: user.photoURL
+                });
                 this.setState({
                     isLogin: true,
                     selectedItem: "Main",
@@ -63,12 +76,12 @@ export default class App extends React.Component<any, AppState> {
 
         this.headerEvent.onValue((item) => {
             const user = Firebase.auth().currentUser;
-            if (user) {
+            if (user && this.state.isLogin) {
                 this.setState({
                     isLogin: item.isLogin,
                     selectedItem: item.selectedItem,
                     uid: user.uid,
-                    displayName: user.displayName,
+                    displayName: this.state.displayName,
                     photoURL: user.photoURL
                 });
             } else {
@@ -83,15 +96,18 @@ export default class App extends React.Component<any, AppState> {
         });
     }
 
+    public componentWillUnmount() {
+        this.isMount = false;
+    }
+
     private selectContents(): JSX.Element {
         switch (this.state.selectedItem) {
             case "Main":
                 return <Chat
                     uid={this.state.uid}
-                    displayName={this.state.displayName}
                     usersRef={this.usersRef}
-                    loginAction={this.loginAction}
-                    loginEvent={this.loginEvent}
+                    twitterLoginAction={this.twitterLoginAction}
+                    twitterLoginEvent={this.twitterLoginEvent}
                     chatRef={this.dbRef.child("chat") }
                     />;
             case "Settings":
@@ -115,7 +131,10 @@ export default class App extends React.Component<any, AppState> {
                         :
                         <div>
                             <NoLoggedInHeader />
-                            <Login usersRef={this.usersRef} action={this.loginAction}  />
+                            <Login
+                                usersRef={this.usersRef}
+                                loginAction={this.loginAction}
+                                />
                         </div>
                 }
             </div>
