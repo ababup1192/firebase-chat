@@ -63,7 +63,7 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
         return <ul className="messagebox" ref="messagebox">
             {
                 this.state.messageList.map((message, lidx) => {
-                    return <li key={`box-line-${lidx}`} className={message.uid === this.props.uid ? "right" : "left"}>
+                    return <li key={`box-line-${lidx}`} className={message.uid === this.props.uid ? "message-me" : "message-other"}>
                         <p key={`box-line-${lidx}-header`}>{`${message.name} :`}</p>
                         {message.content.split("\n").map((line, pidx) =>
                             <p key={`box-line-${lidx}-p-${pidx}`}>{line}</p>

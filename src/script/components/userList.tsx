@@ -47,16 +47,19 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
     }
 
     // Firebaseに現在のログインユーザ情報を保存
-    private saveCurrentUserInfo(user: Firebase.User) {
-        this.props.usersRef.child(user.uid).once("value", (snapShot) => {
-            if (snapShot.val() === null) {
-                this.props.usersRef.child(user.uid).set({
-                    uid: user.uid,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL
-                });
-            }
-        });
+    private saveCurrentUserInfo() {
+        const user = Firebase.auth().currentUser;
+        if (user) {
+            this.props.usersRef.child(user.uid).once("value", (snapShot) => {
+                if (snapShot.val() === null) {
+                    this.props.usersRef.child(user.uid).set({
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        photoURL: user.photoURL
+                    });
+                }
+            });
+        }
     }
 
     // 更新されたユーザリストをイベントに伝搬(ユーザリストが完全に更新されるまで、二秒待つ)
@@ -74,21 +77,18 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
 
     // 10秒間隔でログインユーザリストを更新
     private refleshUserList() {
-        const currentUser = Firebase.auth().currentUser;
-        if (currentUser) {
-            this.updateStateUserList();
-            this.removeUserListRepetedly();
+        this.updateStateUserList();
+        this.removeUserListRepetedly();
 
-            // FirebaseからUsersを読み込む(ログインユーザが削除・変更されたとき)
-            this.props.usersRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
-                this.saveCurrentUserInfo(currentUser);
+        // FirebaseからUsersを読み込む(ログインユーザが削除・変更されたとき)
+        this.props.usersRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
+            this.saveCurrentUserInfo();
 
-                // 更新された情報が空出なければ、更新情報をイベントに伝搬
-                if (snapShot.val()) {
-                    this.notifyUpdatedUserList();
-                }
-            });
-        }
+            // 更新された情報が空出なければ、更新情報をイベントに伝搬
+            if (snapShot.val()) {
+                this.notifyUpdatedUserList();
+            }
+        });
     }
 
     public componentWillMount() {
