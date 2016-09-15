@@ -43,7 +43,7 @@ export default class MessageForm extends React.Component<MessageFormProps, any> 
 
     render() {
         const usersName = this.props.toUsers.isEmpty() ?
-            "(All)" : this.props.toUsers.map((user) => user.displayName).join(" and ");
+            "(ALL)" : this.props.toUsers.map((user) => user.displayName).join(" and ");
         return <textarea
             className="message-form"
             placeholder={`Send => ${usersName}`}

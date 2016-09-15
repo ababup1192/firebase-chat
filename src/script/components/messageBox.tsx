@@ -70,8 +70,8 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
                 this.state.messageList.filter((message) =>
                     message.to.isEmpty() || message.uid === this.props.uid || message.to.some((m) => m.uid === this.props.uid)
                 ).map((message, lidx) => {
-                    const to = `( ${message.to.isEmpty() ? "All" : message.to.map((m) =>
-                        m.uid === this.props.uid ? "Me" : m.displayName).join(" and ")} )`;
+                    const to = `( ${message.to.isEmpty() ? "ALL" : message.to.map((m) =>
+                        m.uid === this.props.uid ? "ME" : m.displayName).join(" and ")} )`;
                     return <li key={`box-line-${lidx}`} className={message.uid === this.props.uid ? "message-me" : "message-other"}>
                         <p key={`box-line-${lidx}-header`}>{`${message.name}  =>  ${to}`}</p>
                         {message.content.split("\n").map((line, pidx) =>
