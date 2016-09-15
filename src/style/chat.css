@@ -26,14 +26,22 @@ ul.users-list li {
     padding: 15px;
     display: flex;
     flex-direction: row;
+    border-bottom: 1px solid #3f3f44;
+    cursor: pointer;
 }
 
 .userinfo:hover {
-    padding: 15px;
-    display: flex;
-    flex-direction: row;
     background: lightgray;
 }
+
+.userinfo.selected {
+    background: deepskyblue;
+}
+/*
+.userinfo.selected:hover {
+    background: gray;
+}
+*/
 
 .userinfo p {
     margin-left: 5px;
