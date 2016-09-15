@@ -3,7 +3,7 @@ import * as ReactDOM from "react-dom";
 import * as Firebase from "firebase";
 import {List, Map, Record} from "immutable";
 import {IUserInfo, TwitterLoginAction} from "../actionCreators/twitterLoginAction";
-import {UserListAction} from "../actionCreators/userListAction";
+import {IUidWithName, UserListAction} from "../actionCreators/userListAction";
 import Dispatcher from "../actionCreators/dispatcher";
 
 interface UsersListProps {
@@ -118,16 +118,16 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         this.props.userListAction.clear();
     }
 
-    private handleClickItem(clickedUid: string, e: MouseEvent) {
-        if (this.state.selectedUserList.contains(clickedUid)) {
+    private handleClickItem(clickedUidWithName: IUidWithName, e: MouseEvent) {
+        if (this.state.selectedUserList.contains(clickedUidWithName.uid)) {
             const selectedUserList: List<string> = this.state.selectedUserList.
-                filterNot((uid) => uid === clickedUid).toList();
+                filterNot((uid) => uid === clickedUidWithName.uid).toList();
             this.setState({ userList: this.state.userList, selectedUserList: selectedUserList });
-            this.props.userListAction.delete(clickedUid);
+            this.props.userListAction.delete(clickedUidWithName.uid);
         } else {
-            const selectedUserList: List<string> = this.state.selectedUserList.push(clickedUid);
+            const selectedUserList: List<string> = this.state.selectedUserList.push(clickedUidWithName.uid);
             this.setState({ userList: this.state.userList, selectedUserList: selectedUserList });
-            this.props.userListAction.push(clickedUid);
+            this.props.userListAction.push(clickedUidWithName);
         }
         e.stopPropagation();
     }
@@ -142,7 +142,7 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
                 this.state.userList.map((user, idx) =>
                     <li
                         key={`users-${idx}`}
-                        onClick={this.handleClickItem.bind(this, user.uid) }
+                        onClick={this.handleClickItem.bind(this, user) }
                         >
                         <div className={`userinfo ${userClass(user.uid)}`}>
                             <img src={ user.photoURL } />

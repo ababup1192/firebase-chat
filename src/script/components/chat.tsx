@@ -4,7 +4,7 @@ import * as Firebase from "firebase";
 import {List, Map} from "immutable";
 import Dispatcher from "../actionCreators/dispatcher";
 import {IMessage, ChatAction} from "../actionCreators/chatAction";
-import {UserListAction} from "../actionCreators/userListAction";
+import {IUidWithName, UserListAction} from "../actionCreators/userListAction";
 import UserList from "./userList.tsx";
 import MessageBox from "./messageBox.tsx";
 import MessageForm from "./messageForm.tsx";
@@ -16,28 +16,28 @@ interface ChatProps {
 }
 
 interface ChatState {
-    userList: List<string>;
+    usersList: List<IUidWithName>;
 }
 
 export default class Chat extends React.Component<ChatProps, ChatState> {
     private chatAction: ChatAction;
     private chatEvent: Bacon.Property<IMessage, List<IMessage>>;
     private userListAction: UserListAction;
-    private userListEvent: Bacon.Property<string, List<string>>;
+    private userListEvent: Bacon.Property<string, List<IUidWithName>>;
 
     constructor(props) {
         super(props);
 
-        this.state = { userList: List<string>() };
+        this.state = { usersList: List<IUidWithName>() };
 
         this.chatAction = new ChatAction(new Dispatcher(), this.props.chatRef);
         this.chatEvent = this.chatAction.createProperty();
-        this.userListAction = new UserListAction(new Dispatcher());
+        this.userListAction = new UserListAction(new Dispatcher(), this.props.usersRef);
         this.userListEvent = this.userListAction.createProperty();
     }
 
     public componentDidMount() {
-        this.userListEvent.onValue((userList) => this.setState({ userList: userList }));
+        this.userListEvent.onValue((users) => this.setState({ usersList: users }));
     }
 
     public componentWillUnmount() {
@@ -62,6 +62,7 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
                     uid={this.props.uid}
                     userRef={this.props.usersRef}
                     chatAction={this.chatAction}
+                    toUsers={this.state.usersList}
                     />
             </div>
         </div>;
