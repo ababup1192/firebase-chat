@@ -111,23 +111,30 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         if (this.updateUserTimer) { clearInterval(this.updateUserTimer); }
     }
 
-    private handleClick(clickedUid: string) {
+    private handleClickList(e: MouseEvent) {
+        this.setState({ userList: this.state.userList, selectedUserList: List<string>() });
+    }
+
+    private handleClickItem(clickedUid: string, e: MouseEvent) {
         const selectedUserList: List<string> = this.state.selectedUserList
             .contains(clickedUid) ?
             this.state.selectedUserList.filterNot((uid) => uid === clickedUid).toList() :
             this.state.selectedUserList.push(clickedUid);
         this.setState({ userList: this.state.userList, selectedUserList: selectedUserList });
+        e.stopPropagation();
     }
 
     render() {
         const userClass = (uid: string) => this.state.selectedUserList.contains(uid) ?
             "selected" : "";
-        return <ul className="users-list">
+        return <ul className="users-list"
+            onClick={this.handleClickList.bind(this) }
+            >
             {
                 this.state.userList.map((user, idx) =>
                     <li
                         key={`users-${idx}`}
-                        onClick={this.handleClick.bind(this, user.uid) }
+                        onClick={this.handleClickItem.bind(this, user.uid) }
                         >
                         <div className={`userinfo ${userClass(user.uid)}`}>
                             <img src={ user.photoURL } />
