@@ -4,12 +4,11 @@ import * as Firebase from "firebase";
 import {List, Map} from "immutable";
 import Dispatcher from "../actionCreators/dispatcher";
 import {IMessage, ChatAction} from "../actionCreators/chatAction";
-import {IUserInfo, LoginAction} from "../actionCreators/loginAction";
 import MessageBox from "./messageBox.tsx";
 
 interface MessageFormProps {
     uid: string;
-    displayName: string;
+    userRef: Firebase.database.Reference;
     chatAction: ChatAction;
 }
 
@@ -24,15 +23,18 @@ export default class MessageForm extends React.Component<MessageFormProps, any> 
         if ((e.which === 13 || e.keyCode === 13) && !e.shiftKey) {
             e.preventDefault();
 
-            const textValue = (e.target as HTMLSelectElement).value;
-            if (textValue !== "") {
-                this.props.chatAction.post({
-                    uid: this.props.uid,
-                    name: this.props.displayName,
-                    content: textValue
-                });
-            }
-            (e.target as HTMLSelectElement).value = "";
+            this.props.userRef.child(this.props.uid).once("value", (snapShot) => {
+                const user = snapShot.val();
+                const textValue = (e.target as HTMLSelectElement).value;
+                if (textValue !== "") {
+                    this.props.chatAction.post({
+                        uid: this.props.uid,
+                        name: user.displayName,
+                        content: textValue
+                    });
+                }
+                (e.target as HTMLSelectElement).value = "";
+            });
         }
     }
 
