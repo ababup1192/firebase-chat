@@ -3,11 +3,13 @@ import * as ReactDOM from "react-dom";
 import * as Firebase from "firebase";
 import {List, Map, Record} from "immutable";
 import {IUserInfo, TwitterLoginAction} from "../actionCreators/twitterLoginAction";
+import {UserListAction} from "../actionCreators/userListAction";
 import Dispatcher from "../actionCreators/dispatcher";
 
 interface UsersListProps {
     uid: string;
     usersRef: Firebase.database.Reference;
+    userListAction: UserListAction;
 }
 
 interface UsersListState {
@@ -113,14 +115,20 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
 
     private handleClickList(e: MouseEvent) {
         this.setState({ userList: this.state.userList, selectedUserList: List<string>() });
+        this.props.userListAction.clear();
     }
 
     private handleClickItem(clickedUid: string, e: MouseEvent) {
-        const selectedUserList: List<string> = this.state.selectedUserList
-            .contains(clickedUid) ?
-            this.state.selectedUserList.filterNot((uid) => uid === clickedUid).toList() :
-            this.state.selectedUserList.push(clickedUid);
-        this.setState({ userList: this.state.userList, selectedUserList: selectedUserList });
+        if (this.state.selectedUserList.contains(clickedUid)) {
+            const selectedUserList: List<string> = this.state.selectedUserList.
+                filterNot((uid) => uid === clickedUid).toList();
+            this.setState({ userList: this.state.userList, selectedUserList: selectedUserList });
+            this.props.userListAction.delete(clickedUid);
+        } else {
+            const selectedUserList: List<string> = this.state.selectedUserList.push(clickedUid);
+            this.setState({ userList: this.state.userList, selectedUserList: selectedUserList });
+            this.props.userListAction.push(clickedUid);
+        }
         e.stopPropagation();
     }
 

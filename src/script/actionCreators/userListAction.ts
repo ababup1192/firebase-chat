@@ -26,6 +26,12 @@ export class UserListAction {
         this.d.push(CLEAR, null);
     }
 
+    public end() {
+        this.d.stream(PUSH).end();
+        this.d.stream(DELELTE).end();
+        this.d.stream(CLEAR).end();
+    }
+
     public createProperty(): Bacon.Property<string, List<string>> {
         return Bacon.update<string, string, string, any, List<string>>(List<string>(),
             [this.d.stream(PUSH)], this._push.bind(this),
