@@ -31,8 +31,6 @@ export default class Chat extends React.Component<ChatProps, any> {
             <UserList
                 uid={this.props.uid}
                 usersRef={this.props.usersRef}
-                // twitterLoginAction={this.props.twitterLoginAction}
-                // twitterLoginEvent={this.props.twitterLoginEvent}
                 />
             <div className="message-area">
                 <MessageBox
