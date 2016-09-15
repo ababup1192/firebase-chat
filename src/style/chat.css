@@ -11,15 +11,15 @@ ul.users-list {
     background: whitesmoke;
     overflow-y: auto;
     word-break: break-all;
+    border: 1px solid #3f3f44;
 }
 
 ul.users-list li {
     width: 100%;
     padding: 0px;
     margin: 0px;
-
-    list-style-type:none !important;
-	list-style-image:none !important;
+    list-style-type: none !important;
+    list-style-image: none !important;
 }
 
 .userinfo {
@@ -44,7 +44,6 @@ ul.users-list li {
     display: flex;
     flex: 1;
     flex-direction: column;
-    
     margin-left: 50px;
 }
 
@@ -89,22 +88,17 @@ ul.users-list li {
     margin: 0px;
 }
 
-
 .message-form {
+    width: 500px;
+    min-height: 80px;
+    margin: 20px 0px 0px 100px;
     flex: 1;
-
-    margin: 0 auto;
-    margin-top: 20px;
-    min-height: 60px;
-    width: 350px;
-
-    color:  #444;
+    color: #444;
     font: inherit;
-
     outline: 0;
     border-radius: 3px;
     border: 1px solid #cecece;
-    background-color:  #fefefe;
+    background-color: #fefefe;
     box-shadow: 1px 2px 1px 0 rgba(0, 0, 0, 0.06);
     overflow: auto;
 }

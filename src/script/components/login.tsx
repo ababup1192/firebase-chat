@@ -67,7 +67,7 @@ export default class Login extends React.Component<LoginProps, LoginState> {
 
     public render() {
         return <div className="login-container">
-            <h1>Afao</h1>
+            <h1>Firebase Chat</h1>
             <div className="login-form">
                 <h2>Log in to your account</h2>
                 <input id="twitter-button" type="button" value="Twitter"

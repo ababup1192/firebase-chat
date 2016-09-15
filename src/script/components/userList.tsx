@@ -24,7 +24,6 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
     constructor(props) {
         super(props);
 
-        this.state = { userList: List<IUserInfo>() };
         this.twitterLoginAction = new TwitterLoginAction(new Dispatcher(), this.props.usersRef);
         this.twitterLoginEvent = this.twitterLoginAction.createProperty();
         this.isMount = false;
@@ -38,12 +37,12 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         );
     }
 
-    // 10秒間隔でログインユーザリストを削除
+    // 15秒間隔でログインユーザリストを削除
     private removeUserListRepetedly() {
         this.props.usersRef.remove();
         this.removeUsersTimer = setInterval(() =>
             this.props.usersRef.remove()
-            , 10 * 1000);
+            , 15 * 1000);
     }
 
     // Firebaseに現在のログインユーザ情報を保存
@@ -68,7 +67,10 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
                 const userListObject = snapShot.val();
                 if (userListObject) {
                     const users = List(Object.keys(userListObject).map((key) => userListObject[key]));
-                    this.twitterLoginAction.innerLogin(users);
+                    const usersList = users.filter((user) => user.uid === this.props.uid).concat(
+                        users.filterNot((user) => user.uid === this.props.uid)
+                    );
+                    this.twitterLoginAction.innerLogin(usersList);
                 }
             }.bind(this))
             , 2 * 1000);
