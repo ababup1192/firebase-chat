@@ -2,6 +2,7 @@ import * as Bacon from "baconjs";
 import Dispatcher from "./dispatcher";
 import {List} from "immutable";
 import * as Firebase from "firebase";
+import {IUidWithName} from "./userListAction";
 
 const POST = "POST";
 const INNER_POST = "INNER_POST";
@@ -9,6 +10,7 @@ const RESET = "RESET";
 
 export interface IMessage {
     uid: string;
+    to: List<IUidWithName>;
     name: string;
     content: string;
 }
@@ -43,7 +45,10 @@ export class ChatAction {
     }
 
     private _post(messageList: List<IMessage>, newMessage: IMessage): List<IMessage> {
-        this.chatRef.push(newMessage);
+        this.chatRef.push({
+            uid: newMessage.uid, to: newMessage.to.toJS()
+            , name: newMessage.name, content: newMessage.content
+        });
         return messageList;
     }
 

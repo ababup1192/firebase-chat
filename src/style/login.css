@@ -61,6 +61,14 @@
   border-radius: 5px;
 }
 
+#login-button:disabled {
+  background-color: darkgray;
+}
+
+#login-button:hover:disabled {
+  background-color: gray;
+}
+
 #login-button:hover {
   background-color: #1A6599;
   border: 1px solid #1A6599;

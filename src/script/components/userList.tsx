@@ -3,15 +3,18 @@ import * as ReactDOM from "react-dom";
 import * as Firebase from "firebase";
 import {List, Map, Record} from "immutable";
 import {IUserInfo, TwitterLoginAction} from "../actionCreators/twitterLoginAction";
+import {IUidWithName, UserListAction} from "../actionCreators/userListAction";
 import Dispatcher from "../actionCreators/dispatcher";
 
 interface UsersListProps {
     uid: string;
     usersRef: Firebase.database.Reference;
+    userListAction: UserListAction;
 }
 
 interface UsersListState {
     userList: List<IUserInfo>;
+    selectedUserList: List<string>;
 }
 
 export default class UserList extends React.Component<UsersListProps, UsersListState> {
@@ -27,22 +30,23 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         this.twitterLoginAction = new TwitterLoginAction(new Dispatcher(), this.props.usersRef);
         this.twitterLoginEvent = this.twitterLoginAction.createProperty();
         this.isMount = false;
+        this.state = { userList: List<IUserInfo>(), selectedUserList: List<string>() };
     }
 
     // ログインユーザリストを状態に反映(イベント更新を待ち受ける)
     private updateStateUserList() {
         this.twitterLoginEvent.onValue((newUserList: List<IUserInfo>) =>
             // ComponentがUnmountされたら状態の反映をストップ
-            this.setState({ userList: newUserList })
+            this.setState({ userList: newUserList, selectedUserList: this.state.selectedUserList })
         );
     }
 
-    // 15秒間隔でログインユーザリストを削除
+    // 20秒間隔でログインユーザリストを削除
     private removeUserListRepetedly() {
         this.props.usersRef.remove();
         this.removeUsersTimer = setInterval(() =>
             this.props.usersRef.remove()
-            , 15 * 1000);
+            , 20 * 1000);
     }
 
     // Firebaseに現在のログインユーザ情報を保存
@@ -109,12 +113,38 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         if (this.updateUserTimer) { clearInterval(this.updateUserTimer); }
     }
 
+    private handleClickList(e: MouseEvent) {
+        this.setState({ userList: this.state.userList, selectedUserList: List<string>() });
+        this.props.userListAction.clear();
+    }
+
+    private handleClickItem(clickedUidWithName: IUidWithName, e: MouseEvent) {
+        if (this.state.selectedUserList.contains(clickedUidWithName.uid)) {
+            const selectedUserList: List<string> = this.state.selectedUserList.
+                filterNot((uid) => uid === clickedUidWithName.uid).toList();
+            this.setState({ userList: this.state.userList, selectedUserList: selectedUserList });
+            this.props.userListAction.delete(clickedUidWithName.uid);
+        } else {
+            const selectedUserList: List<string> = this.state.selectedUserList.push(clickedUidWithName.uid);
+            this.setState({ userList: this.state.userList, selectedUserList: selectedUserList });
+            this.props.userListAction.push(clickedUidWithName);
+        }
+        e.stopPropagation();
+    }
+
     render() {
-        return <ul className="users-list">
+        const userClass = (uid: string) => this.state.selectedUserList.contains(uid) ?
+            "selected" : "";
+        return <ul className="users-list"
+            onClick={this.handleClickList.bind(this) }
+            >
             {
                 this.state.userList.map((user, idx) =>
-                    <li key={`users-${idx}`}>
-                        <div className="userinfo">
+                    <li
+                        key={`users-${idx}`}
+                        onClick={this.handleClickItem.bind(this, user) }
+                        >
+                        <div className={`userinfo ${userClass(user.uid)}`}>
                             <img src={ user.photoURL } />
                             <p>{user.displayName}</p>
                         </div>

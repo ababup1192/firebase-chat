@@ -51,7 +51,12 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
 
         this.props.chatRef.on("child_added", (snapShot: Firebase.database.DataSnapshot) => {
             const newMessage: IMessage = snapShot.val();
-            this.props.chatAction.innerPost(newMessage);
+            this.props.chatAction.innerPost({
+                uid: newMessage.uid,
+                to: List(newMessage.to),
+                name: newMessage.name,
+                content: newMessage.content
+            });
         });
     }
 
@@ -62,9 +67,13 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
     render() {
         return <ul className="messagebox" ref="messagebox">
             {
-                this.state.messageList.map((message, lidx) => {
+                this.state.messageList.filter((message) =>
+                    message.to.isEmpty() || message.uid === this.props.uid || message.to.some((m) => m.uid === this.props.uid)
+                ).map((message, lidx) => {
+                    const to = `( ${message.to.isEmpty() ? "All" : message.to.map((m) =>
+                        m.uid === this.props.uid ? "Me" : m.displayName).join(" and ")} )`;
                     return <li key={`box-line-${lidx}`} className={message.uid === this.props.uid ? "message-me" : "message-other"}>
-                        <p key={`box-line-${lidx}-header`}>{`${message.name} :`}</p>
+                        <p key={`box-line-${lidx}-header`}>{`${message.name}  =>  ${to}`}</p>
                         {message.content.split("\n").map((line, pidx) =>
                             <p key={`box-line-${lidx}-p-${pidx}`}>{line}</p>
                         ) }

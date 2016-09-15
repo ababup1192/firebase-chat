@@ -4,12 +4,14 @@ import * as Firebase from "firebase";
 import {List, Map} from "immutable";
 import Dispatcher from "../actionCreators/dispatcher";
 import {IMessage, ChatAction} from "../actionCreators/chatAction";
+import {IUidWithName} from "../actionCreators/userListAction";
 import MessageBox from "./messageBox.tsx";
 
 interface MessageFormProps {
     uid: string;
     userRef: Firebase.database.Reference;
     chatAction: ChatAction;
+    toUsers: List<IUidWithName>;
 }
 
 export default class MessageForm extends React.Component<MessageFormProps, any> {
@@ -29,6 +31,7 @@ export default class MessageForm extends React.Component<MessageFormProps, any> 
                 if (textValue !== "") {
                     this.props.chatAction.post({
                         uid: this.props.uid,
+                        to: this.props.toUsers.toList(),
                         name: user.displayName,
                         content: textValue
                     });
@@ -39,9 +42,11 @@ export default class MessageForm extends React.Component<MessageFormProps, any> 
     }
 
     render() {
+        const usersName = this.props.toUsers.isEmpty() ?
+            "(All)" : this.props.toUsers.map((user) => user.displayName).join(" and ");
         return <textarea
             className="message-form"
-            placeholder="Write your comment here"
+            placeholder={`Send => ${usersName}`}
             name="comment"
             onKeyPress={this.handleKey.bind(this) } />;
     }

@@ -84,6 +84,7 @@ export default class Login extends React.Component<LoginProps, LoginState> {
                         />
                 </div>
                 <input id="login-button" type="button" value="Log in"
+                    disabled={this.state.uid === ""}
                     onClick={ this.handleClickLogin.bind(this) }
                     />
             </div>
