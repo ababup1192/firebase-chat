@@ -1,8 +1,19 @@
+/* reset css */
+
 @import url(~sanitize.css/sanitize.css);
 
+/* web-font */
+
+@import url(https://fonts.googleapis.com/css?family=Great+Vibes);
+@import url(http://fonts.googleapis.com/earlyaccess/notosansjapanese.css);
+
+/* web-icon */
+
+@import url(https://maxcdn.bootstrapcdn.com/font-awesome/4.6.3/css/font-awesome.min.css);
+
+/* css */
+
+@import url(./global.css);
 @import url(./headerMenu.css);
-
 @import url(./login.css);
-
 @import url(./chat.css);
-

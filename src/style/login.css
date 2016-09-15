@@ -1,47 +1,102 @@
-.loginForm {
-    width: 300px;
+.login-container {
+  width: 100%;
+  height: 100%;
+  margin: 20px auto 0px;
+  display: flex;
+  flex-direction: column;
+  text-align: center;
 }
 
-.loginForm input[type="button"]{
-    background-color: green;
-    color: white;
-    border: 2px solid blue;
+.login-container h1 {
+  margin: 0px;
+  font-size: 4em;
+  font-family: 'Great Vibes', cursive;
+}
+
+.login-form {
+  width: 400px;
+  height: 400px;
+  margin: 20px auto 0px;
+  padding: 25px 50px;
+  display: inline-flex;
+  flex-direction: column;
+  justify-content: space-between;
+  background: whitesmoke;
+  border: 1px solid #3f3f44;
+  border-radius: 10px;
+}
+
+.login-form img {
+  width: 58px;
+  height: 58px;
+  margin: 0px auto 0px;
+}
+
+.login-form input[type="button"] {
+  font-size: 1.3em;
+}
+
+.login-form input[type="button"]:hover {
+  cursor: pointer;
+}
+
+#twitter-button {
+  height: 43px;
+  background-color: #5EA9DD;
+  color: white;
+  border: 1px solid #4D98CC;
+  border-radius: 5px;
+}
+
+#twitter-button:hover {
+  background-color: #4D98CC;
+  border: 1px solid #4D98CC;
+}
+
+#login-button {
+  height: 43px;
+  background-color: #2B76AA;
+  color: white;
+  border: 1px solid #1A6599;
+  border-radius: 5px;
+}
+
+#login-button:hover {
+  background-color: #1A6599;
+  border: 1px solid #1A6599;
 }
 
 .InputAddOn {
   display: flex;
-  margin-bottom: 1.5em;
 }
 
 .InputAddOn-field {
   flex: 1;
+  background: white;
 }
 
 .InputAddOn-field:not(:first-child) {
   border-left: 0;
 }
+
 .InputAddOn-field:not(:last-child) {
   border-right: 0;
 }
 
 .InputAddOn-item {
-  background-color: rgba(147, 128, 108, 0.1);
-  color: #666666;
-  font: inherit;
-  font-weight: normal;
+  background-color: lightgrey;
+  font-size: 1.4em;
 }
 
-.InputAddOn-field,
-.InputAddOn-item {
-  border: 1px solid rgba(147, 128, 108, 0.25);
+.InputAddOn-field, .InputAddOn-item {
+  border: 1px solid #3f3f44;
   padding: 0.5em 0.75em;
 }
-.InputAddOn-field:first-child,
-.InputAddOn-item:first-child {
+
+.InputAddOn-field:first-child, .InputAddOn-item:first-child {
   border-radius: 2px 0 0 2px;
 }
-.InputAddOn-field:last-child,
-.InputAddOn-item:last-child {
+
+.InputAddOn-field:last-child, .InputAddOn-item:last-child {
   border-radius: 0 2px 2px 0;
 }
-
