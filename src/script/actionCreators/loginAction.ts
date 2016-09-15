@@ -13,8 +13,12 @@ export class LoginAction {
         this.d = dispatcher;
     }
 
-    public login(userInfo: IUserInfo): void {
+    public login(userInfo: IUserInfo) {
         this.d.push(LOGIN, userInfo);
+    }
+
+    public end() {
+        this.d.stream(LOGIN).end();
     }
 
     public createProperty(): Bacon.Property<IUserInfo, IUserInfo> {

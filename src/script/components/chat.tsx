@@ -13,8 +13,6 @@ interface ChatProps {
     uid: string;
     usersRef: Firebase.database.Reference;
     chatRef: Firebase.database.Reference;
-    twitterLoginAction: TwitterLoginAction;
-    twitterLoginEvent: Bacon.Property<IUserInfo, List<IUserInfo>>;
 }
 
 export default class Chat extends React.Component<ChatProps, any> {
@@ -33,8 +31,8 @@ export default class Chat extends React.Component<ChatProps, any> {
             <UserList
                 uid={this.props.uid}
                 usersRef={this.props.usersRef}
-                twitterLoginAction={this.props.twitterLoginAction}
-                twitterLoginEvent={this.props.twitterLoginEvent}
+                // twitterLoginAction={this.props.twitterLoginAction}
+                // twitterLoginEvent={this.props.twitterLoginEvent}
             />
             <div className="message-area">
                 <MessageBox

@@ -30,6 +30,11 @@ export class ChatAction {
         this.d.push(INNER_POST, message);
     }
 
+    public end() {
+        this.d.stream(POST).end();
+        this.d.stream(INNER_POST).end();
+    }
+
     public createProperty(): Bacon.Property<IMessage, List<IMessage>> {
         return Bacon.update<IMessage, IMessage, any, List<IMessage>>(List<IMessage>(),
             [this.d.stream(POST)], this._post.bind(this),

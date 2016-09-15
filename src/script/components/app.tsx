@@ -22,15 +22,12 @@ interface AppState {
 }
 
 export default class App extends React.Component<any, AppState> {
-    private twitterLoginAction: TwitterLoginAction;
-    private twitterLoginEvent: Bacon.Property<IUserInfo, List<IUserInfo>>;
     private loginAction: LoginAction;
     private loginEvent: Bacon.Property<IUserInfo, IUserInfo>;
     private headerAction: HeaderAction;
     private headerEvent: Bacon.Property<IItemInfo, IItemInfo>;
     private dbRef: Firebase.database.Reference;
     private usersRef: Firebase.database.Reference;
-    private isMount: boolean;
 
     constructor(props) {
         super(props);
@@ -45,20 +42,15 @@ export default class App extends React.Component<any, AppState> {
 
         this.dbRef = Firebase.database().ref();
         this.usersRef = this.dbRef.child("users");
-        this.twitterLoginAction = new TwitterLoginAction(new Dispatcher(), this.usersRef);
-        this.twitterLoginEvent = this.twitterLoginAction.createProperty();
         this.loginAction = new LoginAction(new Dispatcher());
         this.loginEvent = this.loginAction.createProperty();
         this.headerAction = new HeaderAction(new Dispatcher());
         this.headerEvent = this.headerAction.createProperty();
-        this.isMount = false;
     }
 
     private componentDidMount() {
-        this.isMount = true;
-
         this.loginEvent.onValue((user) => {
-            if (Firebase.auth().currentUser && this.isMount) {
+            if (Firebase.auth().currentUser) {
                 this.usersRef.child(user.uid).set({
                     uid: user.uid,
                     displayName: user.displayName,
@@ -97,7 +89,7 @@ export default class App extends React.Component<any, AppState> {
     }
 
     public componentWillUnmount() {
-        this.isMount = false;
+        this.loginAction.end();
     }
 
     private selectContents(): JSX.Element {
@@ -106,8 +98,8 @@ export default class App extends React.Component<any, AppState> {
                 return <Chat
                     uid={this.state.uid}
                     usersRef={this.usersRef}
-                    twitterLoginAction={this.twitterLoginAction}
-                    twitterLoginEvent={this.twitterLoginEvent}
+                    // twitterLoginAction={this.twitterLoginAction}
+                    // twitterLoginEvent={this.twitterLoginEvent}
                     chatRef={this.dbRef.child("chat") }
                     />;
             case "Settings":

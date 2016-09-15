@@ -21,12 +21,17 @@ export class TwitterLoginAction {
         this.usersRef = userRef;
     }
 
-    public login(userInfo: IUserInfo): void {
+    public login(userInfo: IUserInfo) {
         this.d.push(LOGIN, userInfo);
     }
 
-    public innerLogin(userInfoList: List<IUserInfo>): void {
+    public innerLogin(userInfoList: List<IUserInfo>) {
         this.d.push(INNER_LOGIN, userInfoList);
+    }
+
+    public end() {
+        this.d.stream(LOGIN).end();
+        this.d.stream(INNER_LOGIN).end();
     }
 
     public createProperty(): Bacon.Property<IUserInfo, List<IUserInfo>> {
