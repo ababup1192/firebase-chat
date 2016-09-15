@@ -31,6 +31,7 @@ export default class MessageForm extends React.Component<MessageFormProps, any> 
                 if (textValue !== "") {
                     this.props.chatAction.post({
                         uid: this.props.uid,
+                        to: this.props.toUsers.toList(),
                         name: user.displayName,
                         content: textValue
                     });
@@ -42,10 +43,10 @@ export default class MessageForm extends React.Component<MessageFormProps, any> 
 
     render() {
         const usersName = this.props.toUsers.isEmpty() ?
-            "All" : this.props.toUsers.map((user) => user.displayName).join(" and ");
+            "(All)" : this.props.toUsers.map((user) => user.displayName).join(" and ");
         return <textarea
             className="message-form"
-            placeholder={`Send -> ${usersName}`}
+            placeholder={`Send => ${usersName}`}
             name="comment"
             onKeyPress={this.handleKey.bind(this) } />;
     }
