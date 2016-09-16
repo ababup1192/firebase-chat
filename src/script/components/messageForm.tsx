@@ -6,42 +6,44 @@ import Dispatcher from "../actionCreators/dispatcher";
 
 import {UserInfoUtil} from "../utils/userInfo";
 import {IUserInfo, IMessage} from "../definition/definitions";
-import {ChatAction} from "../actionCreators/chatAction";
 import MessageBox from "./messageBox.tsx";
 
 interface MessageFormProps {
     uid: string;
     userRef: Firebase.database.Reference;
-    chatAction: ChatAction;
+    chatRef: Firebase.database.Reference;
     toUsers: List<IUserInfo>;
 }
 
 export default class MessageForm extends React.Component<MessageFormProps, any> {
-    private chatEvent: Bacon.Property<IMessage, List<IMessage>>;
-
     constructor(props) {
         super(props);
     }
+
+    private postMessage(textValue: string) {
+        this.props.userRef.child(this.props.uid).once("value", function (snapShot: Firebase.database.DataSnapshot) {
+            const user = UserInfoUtil.toUserInfo(snapShot.val());
+            this.props.chatRef.push(UserInfoUtil.toFirebaseMessage({
+                uid: this.props.uid,
+                displayName: user.displayName,
+                photoURL: user.photoURL,
+                content: textValue,
+                to: this.props.toUsers,
+                postTime: new Date()
+            }));
+        }.bind(this));
+    }
+
 
     handleKey(e: KeyboardEvent) {
         if ((e.which === 13 || e.keyCode === 13) && !e.shiftKey) {
             e.preventDefault();
 
             const textValue = (e.target as HTMLSelectElement).value;
-            this.props.userRef.child(this.props.uid).once("value", (snapShot: Firebase.database.DataSnapshot) => {
-                const user = UserInfoUtil.toUserInfo(snapShot.val());
-                if (textValue !== "") {
-                    this.props.chatAction.post({
-                        uid: this.props.uid,
-                        displayName: user.displayName,
-                        photoURL: user.photoURL,
-                        content: textValue,
-                        to: this.props.toUsers,
-                        postTime: new Date()
-                    });
-                }
-            });
-            (e.target as HTMLSelectElement).value = "";
+            if (textValue !== "") {
+                this.postMessage(textValue);
+                (e.target as HTMLSelectElement).value = "";
+            }
         }
     }
 

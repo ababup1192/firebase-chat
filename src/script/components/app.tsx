@@ -131,8 +131,8 @@ export default class App extends React.Component<any, AppState> {
             this.setState({
                 isLogin: item.isLogin,
                 selectedItem: item.selectedItem,
-                uid: this.state.uid, 
-                photoURL: this.state.photoURL, 
+                uid: this.state.uid,
+                photoURL: this.state.photoURL,
                 displayName: this.state.displayName
             });
         });
@@ -156,28 +156,30 @@ export default class App extends React.Component<any, AppState> {
         }
     }
 
+    private showHeaderWithContents(): JSX.Element {
+        return this.state.isLogin ?
+            <div>
+                <LoggedInHeader
+                    loginStatusRef={ this.loginStatusRef }
+                    photoURL={ this.state.photoURL }
+                    headerAction={ this.headerAction }
+                    />
+                { this.selectContents() }
+            </div>
+            :
+            <div>
+                <NoLoggedInHeader />
+                <Login
+                    usersRef={this.usersRef}
+                    loginAction={this.loginAction}
+                    />
+            </div>;
+    }
+
     render() {
         return (
             <div className="app">
-                {
-                    this.state.isLogin ?
-                        <div>
-                            <LoggedInHeader
-                                loginStatusRef={ this.loginStatusRef }
-                                photoURL={ this.state.photoURL }
-                                headerAction={ this.headerAction }
-                                />
-                            { this.selectContents() }
-                        </div>
-                        :
-                        <div>
-                            <NoLoggedInHeader />
-                            <Login
-                                usersRef={this.usersRef}
-                                loginAction={this.loginAction}
-                                />
-                        </div>
-                }
+                {this.showHeaderWithContents() }
             </div>
         );
     }

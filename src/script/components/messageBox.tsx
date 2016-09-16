@@ -5,13 +5,10 @@ import {List, Map} from "immutable";
 
 import {UserInfoUtil} from "../utils/userInfo";
 import {IMessage, IFirebaseMessage} from "../definition/definitions";
-import {ChatAction} from "../actionCreators/chatAction";
 
 interface MessageBoxProps {
     uid: string;
     chatRef: Firebase.database.Reference;
-    chatAction: ChatAction;
-    chatEvent: Bacon.Property<IMessage, List<IMessage>>;
 }
 
 interface MessageBoxState {
@@ -40,22 +37,14 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
     }
 
     public componentDidMount() {
-        this.autoScroll();
-    }
-
-    public componentWillMount() {
         this.isMount = true;
-
-        this.props.chatEvent.onValue((newMessageList: List<IMessage>) => {
+        this.props.chatRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
             if (this.isMount) {
-                this.setState({ messageList: newMessageList });
+                const messageList: List<IMessage> = UserInfoUtil.toMessageList(snapShot.val());
+                this.setState({ messageList: messageList });
             }
         });
-
-        this.props.chatRef.on("child_added", (snapShot: Firebase.database.DataSnapshot) => {
-            const newMessage: IMessage = UserInfoUtil.toMessage(snapShot.val());
-            this.props.chatAction.innerPost(newMessage);
-        });
+        this.autoScroll();
     }
 
     public componentWillUnmount() {

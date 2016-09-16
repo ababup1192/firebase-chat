@@ -8,7 +8,6 @@ import Dispatcher from "../actionCreators/dispatcher";
 import {IUserInfo, IMessage} from "../definition/definitions";
 
 /* Action */
-import {ChatAction} from "../actionCreators/chatAction";
 import {UserListAction} from "../actionCreators/userListAction";
 
 /* Component */
@@ -28,8 +27,6 @@ interface ChatState {
 }
 
 export default class Chat extends React.Component<ChatProps, ChatState> {
-    private chatAction: ChatAction;
-    private chatEvent: Bacon.Property<IMessage, List<IMessage>>;
     private userListAction: UserListAction;
     private userListEvent: Bacon.Property<string, List<IUserInfo>>;
 
@@ -38,9 +35,7 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
 
         this.state = { usersList: List<IUserInfo>() };
 
-        this.chatAction = new ChatAction(new Dispatcher(), this.props.chatRef);
-        this.chatEvent = this.chatAction.createProperty();
-        this.userListAction = new UserListAction(new Dispatcher(), this.props.usersRef);
+        this.userListAction = new UserListAction(new Dispatcher());
         this.userListEvent = this.userListAction.createProperty();
     }
 
@@ -64,13 +59,11 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
                 <MessageBox
                     uid={this.props.uid}
                     chatRef={this.props.chatRef}
-                    chatAction={this.chatAction}
-                    chatEvent={this.chatEvent}
                     />
                 <MessageForm
                     uid={this.props.uid}
                     userRef={this.props.usersRef}
-                    chatAction={this.chatAction}
+                    chatRef={this.props.chatRef}
                     toUsers={this.state.usersList}
                     />
             </div>

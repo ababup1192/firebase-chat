@@ -11,11 +11,9 @@ const CLEAR = "CLEAR";
 
 export class UserListAction {
     private d: Dispatcher;
-    private usersRef: Firebase.database.Reference;
 
-    constructor(dispatcher: Dispatcher, usersRef: Firebase.database.Reference) {
+    constructor(dispatcher: Dispatcher) {
         this.d = dispatcher;
-        this.usersRef = usersRef;
     }
 
     public push(userInfo: IUserInfo) {

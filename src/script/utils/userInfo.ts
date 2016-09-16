@@ -59,4 +59,9 @@ export class UserInfoUtil {
             };
         }
     }
+
+    public static toMessageList(firebaseMessageObj: { string: IFirebaseMessage }): List<IMessage> {
+        return List(Object.keys(firebaseMessageObj).map((uid) => firebaseMessageObj[uid])
+            .map((message: IFirebaseMessage) => UserInfoUtil.toMessage(message)));
+    }
 }
