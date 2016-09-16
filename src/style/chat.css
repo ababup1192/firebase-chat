@@ -37,11 +37,6 @@ ul.users-list li {
 .userinfo.selected {
     background: deepskyblue;
 }
-/*
-.userinfo.selected:hover {
-    background: gray;
-}
-*/
 
 .userinfo p {
     margin-left: 5px;
