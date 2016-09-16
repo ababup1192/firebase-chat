@@ -33,7 +33,7 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
     public componentDidMount() {
         this.isMount = true;
         this.props.loginStatusRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
-            if (this.isMount) {
+            if (this.isMount && snapShot.val()) {
                 const loginStatusList = UserInfoUtil.toUserInfoList(snapShot.val());
                 this.setState({
                     loginStatusList: loginStatusList,

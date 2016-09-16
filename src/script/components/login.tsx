@@ -59,8 +59,7 @@ export default class Login extends React.Component<LoginProps, LoginState> {
         Firebase.auth().signInWithPopup(provider).then((result) => {
             const user = result.user;
             this.props.usersRef.child(user.uid).once("value").then((snapShot) => {
-                const dbVal = snapShot.val();
-                const dbUser: IUserInfo = dbVal === null ? null : UserInfoUtil.toUserInfo(snapShot.val());
+                const dbUser: IUserInfo = snapShot.val() === null ? null : UserInfoUtil.toUserInfo(snapShot.val());
                 this.setState({
                     uid: user.uid,
                     displayName: dbUser === null ? user.displayName : dbUser.displayName,

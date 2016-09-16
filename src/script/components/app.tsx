@@ -14,7 +14,6 @@ import {UserInfoUtil} from "../utils/userInfo";
 /* Action */
 import {HeaderAction} from "../actionCreators/headerAction";
 import {LoginAction} from "../actionCreators/LoginAction";
-import {LoginStatusAction} from "../actionCreators/LoginStatusAction";
 
 /* Component */
 import NoLoggedInHeader from "./noLoggedInHeader.tsx";
@@ -42,8 +41,6 @@ export default class App extends React.Component<any, AppState> {
     private headerEvent: Bacon.Property<IHeaderInfo, IHeaderInfo>;
     private loginAction: LoginAction;
     private loginEvent: Bacon.Property<IUserInfo, IUserInfo>;
-    private loginStatusAction: LoginStatusAction;
-    private loginStatusEvent: Bacon.Property<IUserInfo, IUserInfo>;
 
     constructor(props) {
         super(props);
@@ -67,8 +64,6 @@ export default class App extends React.Component<any, AppState> {
         this.headerEvent = this.headerAction.createProperty();
         this.loginAction = new LoginAction(new Dispatcher());
         this.loginEvent = this.loginAction.createProperty();
-        this.loginStatusAction = new LoginStatusAction(new Dispatcher(), this.loginStatusRef);
-        this.loginStatusEvent = this.loginStatusAction.createProperty();
     }
 
     private updateLoginStatus(user: IUserInfo) {
@@ -133,12 +128,11 @@ export default class App extends React.Component<any, AppState> {
         });
 
         this.headerEvent.onValue((item) => {
-            // const user = Firebase.auth().currentUser;
             this.setState({
                 isLogin: item.isLogin,
                 selectedItem: item.selectedItem,
-                uid: this.state.uid, // user === null ? "" : user.uid,
-                photoURL: this.state.photoURL, // user.photoURL === null ? "" : user.photoURL,
+                uid: this.state.uid, 
+                photoURL: this.state.photoURL, 
                 displayName: this.state.displayName
             });
         });
@@ -169,7 +163,7 @@ export default class App extends React.Component<any, AppState> {
                     this.state.isLogin ?
                         <div>
                             <LoggedInHeader
-                                usersRef={ this.usersRef }
+                                loginStatusRef={ this.loginStatusRef }
                                 photoURL={ this.state.photoURL }
                                 headerAction={ this.headerAction }
                                 />

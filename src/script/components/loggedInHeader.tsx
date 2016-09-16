@@ -5,7 +5,7 @@ import * as Firebase from "firebase";
 import { HeaderAction } from "../actionCreators/headerAction";
 
 interface LoggedInHeaderProps {
-    usersRef: Firebase.database.Reference;
+    loginStatusRef: Firebase.database.Reference;
     photoURL: string;
     headerAction: HeaderAction;
 }
@@ -32,7 +32,7 @@ export default class LoggedInHeader extends React.Component<LoggedInHeaderProps,
 
     private handleClickLogout() {
         if (confirm("ログアウトして、よろしいですか？")) {
-            this.props.usersRef.child(Firebase.auth().currentUser.uid).remove();
+            this.props.loginStatusRef.child(Firebase.auth().currentUser.uid).remove();
             Firebase.auth().signOut().then(() => { }
                 , function (error) {
                     console.error(error);

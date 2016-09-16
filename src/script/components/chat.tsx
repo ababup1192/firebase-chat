@@ -21,7 +21,6 @@ interface ChatProps {
     usersRef: Firebase.database.Reference;
     chatRef: Firebase.database.Reference;
     loginStatusRef: Firebase.database.Reference;
-    // loginUserEvent: Bacon.Property<IUserInfo, IUserInfo>;
 }
 
 interface ChatState {
@@ -46,9 +45,6 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
     }
 
     public componentDidMount() {
-        /*this.props.loginUserEvent.onValue(() => {
-
-        });*/
         this.userListEvent.onValue((users) => this.setState({ usersList: users }));
     }
 
