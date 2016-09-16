@@ -24,4 +24,4 @@ window.onbeforeunload = (event) => {
 };
 */
 
-ReactDOM.render(<App user={"abab"}/>, appNode);
+ReactDOM.render(<App/>, appNode);

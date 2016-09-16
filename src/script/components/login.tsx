@@ -40,7 +40,6 @@ export default class Login extends React.Component<LoginProps, LoginState> {
         } else {
             alert("twitterボタンを押して、認証してからクリックしてください。");
         }
-
     }
 
     private handleName(e: KeyboardEvent) {
