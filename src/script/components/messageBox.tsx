@@ -2,7 +2,10 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as Firebase from "firebase";
 import {List, Map} from "immutable";
-import {IMessage, ChatAction} from "../actionCreators/chatAction";
+
+import {UserInfoUtil} from "../utils/userInfo";
+import {IMessage, IFirebaseMessage} from "../definition/definitions";
+import {ChatAction} from "../actionCreators/chatAction";
 
 interface MessageBoxProps {
     uid: string;
@@ -50,13 +53,8 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
         });
 
         this.props.chatRef.on("child_added", (snapShot: Firebase.database.DataSnapshot) => {
-            const newMessage: IMessage = snapShot.val();
-            this.props.chatAction.innerPost({
-                uid: newMessage.uid,
-                to: List(newMessage.to),
-                name: newMessage.name,
-                content: newMessage.content
-            });
+            const newMessage: IMessage = UserInfoUtil.toMessage(snapShot.val());
+            this.props.chatAction.innerPost(newMessage);
         });
     }
 
@@ -73,7 +71,7 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
                     const to = `( ${message.to.isEmpty() ? "ALL" : message.to.map((m) =>
                         m.uid === this.props.uid ? "ME" : m.displayName).join(" and ")} )`;
                     return <li key={`box-line-${lidx}`} className={message.uid === this.props.uid ? "message-me" : "message-other"}>
-                        <p key={`box-line-${lidx}-header`}>{`${message.name}  =>  ${to}`}</p>
+                        <p key={`box-line-${lidx}-header`}>{`${message.displayName}  =>  ${to}`}</p>
                         {message.content.split("\n").map((line, pidx) =>
                             <p key={`box-line-${lidx}-p-${pidx}`}>{line}</p>
                         ) }

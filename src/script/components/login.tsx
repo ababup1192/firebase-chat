@@ -5,6 +5,8 @@ import * as Firebase from "firebase";
 
 import Dispatcher from "../actionCreators/dispatcher";
 import {LoginAction} from "../actionCreators/loginAction";
+import {IUserInfo} from "../definition/definitions";
+import {UserInfoUtil} from "../utils/userInfo";
 
 interface LoginProps {
     usersRef: Firebase.database.Reference;
@@ -13,8 +15,8 @@ interface LoginProps {
 
 interface LoginState {
     uid: string;
-    photoURL: string;
     displayName: string;
+    photoURL: string;
 }
 
 export default class Login extends React.Component<LoginProps, LoginState> {
@@ -31,8 +33,9 @@ export default class Login extends React.Component<LoginProps, LoginState> {
         if (this.state.uid !== "") {
             this.props.loginAction.login({
                 uid: this.state.uid,
+                displayName: this.state.displayName,
                 photoURL: this.state.photoURL,
-                displayName: this.state.displayName
+                updateTime: new Date()
             });
         } else {
             alert("twitterボタンを押して、認証してからクリックしてください。");
@@ -46,7 +49,7 @@ export default class Login extends React.Component<LoginProps, LoginState> {
         this.setState({
             uid: this.state.uid,
             photoURL: this.state.photoURL,
-            displayName: textValue,
+            displayName: textValue
         });
     }
 
@@ -55,13 +58,17 @@ export default class Login extends React.Component<LoginProps, LoginState> {
 
         Firebase.auth().signInWithPopup(provider).then((result) => {
             const user = result.user;
-            this.setState({
-                uid: user.uid,
-                photoURL: user.photoURL,
-                displayName: user.displayName
+            this.props.usersRef.child(user.uid).once("value").then((snapShot) => {
+                const dbVal = snapShot.val();
+                const dbUser: IUserInfo = dbVal === null ? null : UserInfoUtil.toUserInfo(snapShot.val());
+                this.setState({
+                    uid: user.uid,
+                    displayName: dbUser === null ? user.displayName : dbUser.displayName,
+                    photoURL: user.photoURL
+                });
             });
         }).catch((error) => {
-            console.log(error);
+            console.error(error);
         });
     }
 
