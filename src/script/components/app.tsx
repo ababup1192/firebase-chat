@@ -6,7 +6,7 @@ import * as Bacon from "baconjs";
 import Dispatcher from "../actionCreators/dispatcher";
 
 /* Definition */
-import {IHeaderInfo, IUserInfo} from "../definition/definitions";
+import {HeaderInfo, IUserInfo} from "../definition/definitions";
 
 /* Utils */
 import {UserInfoUtil} from "../utils/userInfo";
@@ -38,7 +38,7 @@ export default class App extends React.Component<any, AppState> {
 
     /* Action and Event */
     private headerAction: HeaderAction;
-    private headerEvent: Bacon.Property<IHeaderInfo, IHeaderInfo>;
+    private headerEvent: Bacon.Property<HeaderInfo, HeaderInfo>;
     private loginAction: LoginAction;
     private loginEvent: Bacon.Property<IUserInfo, IUserInfo>;
 
@@ -127,10 +127,10 @@ export default class App extends React.Component<any, AppState> {
             }
         });
 
-        this.headerEvent.onValue((item) => {
+        this.headerEvent.onValue((header) => {
             this.setState({
-                isLogin: item.isLogin,
-                selectedItem: item.selectedItem,
+                isLogin: header.isLogin(),
+                selectedItem: header.selectedItem(),
                 uid: this.state.uid,
                 photoURL: this.state.photoURL,
                 displayName: this.state.displayName
@@ -171,6 +171,7 @@ export default class App extends React.Component<any, AppState> {
                 <NoLoggedInHeader />
                 <Login
                     usersRef={this.usersRef}
+                    headerAction={this.headerAction}
                     loginAction={this.loginAction}
                     />
             </div>;

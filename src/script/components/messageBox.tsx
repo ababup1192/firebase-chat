@@ -39,8 +39,9 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
     public componentDidMount() {
         this.isMount = true;
         this.props.chatRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
-            if (this.isMount) {
-                const messageList: List<IMessage> = UserInfoUtil.toMessageList(snapShot.val());
+            const firebaseMessageList = snapShot.val();
+            if (this.isMount && firebaseMessageList) {
+                const messageList: List<IMessage> = UserInfoUtil.toMessageList(firebaseMessageList);
                 this.setState({ messageList: messageList });
             }
         });

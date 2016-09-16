@@ -4,12 +4,14 @@ import {List, Record} from "immutable";
 import * as Firebase from "firebase";
 
 import Dispatcher from "../actionCreators/dispatcher";
+import {HeaderAction} from "../actionCreators/headerAction";
 import {LoginAction} from "../actionCreators/loginAction";
 import {IUserInfo} from "../definition/definitions";
 import {UserInfoUtil} from "../utils/userInfo";
 
 interface LoginProps {
     usersRef: Firebase.database.Reference;
+    headerAction: HeaderAction;
     loginAction: LoginAction;
 }
 
@@ -31,6 +33,7 @@ export default class Login extends React.Component<LoginProps, LoginState> {
 
     private handleClickLogin() {
         if (this.state.uid !== "") {
+            this.props.headerAction.login();
             this.props.loginAction.login({
                 uid: this.state.uid,
                 displayName: this.state.displayName,
