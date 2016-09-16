@@ -36,7 +36,9 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
             if (this.isMount && snapShot.val()) {
                 const loginStatusList = UserInfoUtil.toUserInfoList(snapShot.val());
                 this.setState({
-                    loginStatusList: loginStatusList,
+                    loginStatusList: loginStatusList.filter((user) =>
+                        user.uid === this.props.uid).concat(loginStatusList.filterNot((user) =>
+                            user.uid === this.props.uid)).toList(),
                     selectedUserList: this.state.selectedUserList
                 });
             }
