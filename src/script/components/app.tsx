@@ -2,6 +2,7 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import {List, Record} from "immutable";
 import * as Firebase from "firebase";
+import * as Bacon from "baconjs";
 
 import Dispatcher from "../actionCreators/dispatcher";
 import {LoginAction} from "../actionCreators/LoginAction";
@@ -51,6 +52,15 @@ export default class App extends React.Component<any, AppState> {
     private componentDidMount() {
         this.loginEvent.onValue((user) => {
             if (Firebase.auth().currentUser) {
+                // interval
+                const stream = Bacon.fromPoll<{}, Firebase.User>(3 * 1000, () => {
+                    const user = Firebase.auth().currentUser;
+                    return user === null ? new Bacon.End<Firebase.User>() : new Bacon.Next(user);
+                });/* .onValue((user) =>
+                    console.log(user)
+                    );*/
+
+
                 this.usersRef.child(user.uid).set({
                     uid: user.uid,
                     displayName: user.displayName,
