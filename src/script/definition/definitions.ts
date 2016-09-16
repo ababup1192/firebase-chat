@@ -1,6 +1,12 @@
 
 import {List} from "immutable";
 
+export interface IHeaderInfo {
+    isLogin: boolean;
+    selectedItem: string;
+}
+
+/* User Info */
 export interface IUserInfo {
     uid: string;
     displayName: string;
@@ -15,12 +21,13 @@ export interface IFirebaseUserInfo {
     updateTime: number;
 }
 
+/* Chat Message */
 export interface IMessage {
     uid: string;
     displayName: string;
     photoURL: string;
     to: List<IUserInfo>;
-    contents: string;
+    content: string;
     postTime: Date;
 }
 
@@ -28,8 +35,8 @@ export interface IFirebaseMessage {
     uid: string;
     displayName: string;
     photoURL: string;
-    to: List<IFirebaseUserInfo>;
-    contents: string;
+    to: IFirebaseUserInfo[];
+    content: string;
     postTime: number;
 }
 

@@ -2,7 +2,8 @@ import * as Bacon from "baconjs";
 import Dispatcher from "./dispatcher";
 import * as Firebase from "firebase";
 import {List} from "immutable";
-import {IUserInfo} from "./twitterLoginAction";
+import {IUserInfo} from "../definition/definitions";
+import {UserInfoUtil} from "../utils/userInfo";
 
 const LOGIN = "LOGIN";
 
@@ -22,7 +23,7 @@ export class LoginAction {
     }
 
     public createProperty(): Bacon.Property<IUserInfo, IUserInfo> {
-        return Bacon.update<IUserInfo, IUserInfo, IUserInfo>({ uid: "", photoURL: "", displayName: "" },
+        return Bacon.update<IUserInfo, IUserInfo, IUserInfo>({ uid: "", photoURL: "", displayName: "", updateTime: new Date() },
             [this.d.stream(LOGIN)], this._login.bind(this)
         );
     }

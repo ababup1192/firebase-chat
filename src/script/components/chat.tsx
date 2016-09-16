@@ -3,8 +3,15 @@ import * as ReactDOM from "react-dom";
 import * as Firebase from "firebase";
 import {List, Map} from "immutable";
 import Dispatcher from "../actionCreators/dispatcher";
-import {IMessage, ChatAction} from "../actionCreators/chatAction";
-import {IUidWithName, UserListAction} from "../actionCreators/userListAction";
+
+/* Definition */
+import {IUserInfo, IMessage} from "../definition/definitions";
+
+/* Action */
+import {ChatAction} from "../actionCreators/chatAction";
+import {UserListAction} from "../actionCreators/userListAction";
+
+/* Component */
 import UserList from "./userList.tsx";
 import MessageBox from "./messageBox.tsx";
 import MessageForm from "./messageForm.tsx";
@@ -13,22 +20,24 @@ interface ChatProps {
     uid: string;
     usersRef: Firebase.database.Reference;
     chatRef: Firebase.database.Reference;
+    loginStatusRef: Firebase.database.Reference;
+    // loginUserEvent: Bacon.Property<IUserInfo, IUserInfo>;
 }
 
 interface ChatState {
-    usersList: List<IUidWithName>;
+    usersList: List<IUserInfo>;
 }
 
 export default class Chat extends React.Component<ChatProps, ChatState> {
     private chatAction: ChatAction;
     private chatEvent: Bacon.Property<IMessage, List<IMessage>>;
     private userListAction: UserListAction;
-    private userListEvent: Bacon.Property<string, List<IUidWithName>>;
+    private userListEvent: Bacon.Property<string, List<IUserInfo>>;
 
     constructor(props) {
         super(props);
 
-        this.state = { usersList: List<IUidWithName>() };
+        this.state = { usersList: List<IUserInfo>() };
 
         this.chatAction = new ChatAction(new Dispatcher(), this.props.chatRef);
         this.chatEvent = this.chatAction.createProperty();
@@ -37,6 +46,9 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
     }
 
     public componentDidMount() {
+        /*this.props.loginUserEvent.onValue(() => {
+
+        });*/
         this.userListEvent.onValue((users) => this.setState({ usersList: users }));
     }
 
@@ -49,6 +61,7 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
             <UserList
                 uid={this.props.uid}
                 usersRef={this.props.usersRef}
+                loginStatusRef={this.props.loginStatusRef}
                 userListAction={this.userListAction}
                 />
             <div className="message-area">
