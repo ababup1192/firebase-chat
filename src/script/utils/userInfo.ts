@@ -3,15 +3,6 @@ import {IUserInfo, IFirebaseUserInfo, IMessage, IFirebaseMessage} from "../defin
 
 export class UserInfoUtil {
 
-    public static toFirebaseUserInfo(userInfo: IUserInfo): IFirebaseUserInfo {
-        return {
-            uid: userInfo.uid,
-            displayName: userInfo.displayName,
-            photoURL: userInfo.photoURL,
-            updateTime: userInfo.updateTime.getTime()
-        };
-    }
-
     public static toUserInfo(firebaseUserInfo: IFirebaseUserInfo): IUserInfo {
         return {
             uid: firebaseUserInfo.uid,
@@ -21,20 +12,18 @@ export class UserInfoUtil {
         };
     }
 
+    public static toFirebaseUserInfo(userInfo: IUserInfo): IFirebaseUserInfo {
+        return {
+            uid: userInfo.uid,
+            displayName: userInfo.displayName,
+            photoURL: userInfo.photoURL,
+            updateTime: userInfo.updateTime.getTime()
+        };
+    }
+
     public static toUserInfoList(firebaseUserInfoObj: { string: IFirebaseUserInfo }): List<IUserInfo> {
         return List(Object.keys(firebaseUserInfoObj).map((uid) => firebaseUserInfoObj[uid])
             .map((loginStatus: IFirebaseUserInfo) => UserInfoUtil.toUserInfo(loginStatus)));
-    }
-
-    public static toFirebaseMessage(message: IMessage): IFirebaseMessage {
-        return {
-            uid: message.uid,
-            displayName: message.displayName,
-            photoURL: message.photoURL,
-            to: message.to.isEmpty() ? [] : message.to.map((u) => this.toFirebaseUserInfo(u)).toJS(),
-            content: message.content,
-            postTime: message.postTime.getTime()
-        };
     }
 
     public static toMessage(firebaseMessage: IFirebaseMessage): IMessage {
@@ -47,7 +36,6 @@ export class UserInfoUtil {
                 content: firebaseMessage.content,
                 postTime: new Date(firebaseMessage.postTime)
             };
-
         } else {
             return {
                 uid: firebaseMessage.uid,
@@ -58,6 +46,17 @@ export class UserInfoUtil {
                 postTime: new Date(firebaseMessage.postTime)
             };
         }
+    }
+
+    public static toFirebaseMessage(message: IMessage): IFirebaseMessage {
+        return {
+            uid: message.uid,
+            displayName: message.displayName,
+            photoURL: message.photoURL,
+            to: message.to.isEmpty() ? [] : message.to.map((u) => this.toFirebaseUserInfo(u)).toJS(),
+            content: message.content,
+            postTime: message.postTime.getTime()
+        };
     }
 
     public static toMessageList(firebaseMessageObj: { string: IFirebaseMessage }): List<IMessage> {
