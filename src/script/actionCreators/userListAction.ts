@@ -3,7 +3,7 @@ import Dispatcher from "./dispatcher";
 import * as Firebase from "firebase";
 import {List} from "immutable";
 
-import {IUserInfo} from "../definition/definitions";
+import {IUserInfo} from "../definitions/definitions";
 
 const PUSH = "PUSH";
 const DELELTE = "DELETE";

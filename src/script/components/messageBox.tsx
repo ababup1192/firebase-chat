@@ -4,7 +4,7 @@ import * as Firebase from "firebase";
 import {List, Map} from "immutable";
 
 import {UserInfoUtil} from "../utils/userInfo";
-import {IMessage, IFirebaseMessage} from "../definition/definitions";
+import {IMessage, IFirebaseMessage} from "../definitions/definitions";
 
 interface MessageBoxProps {
     uid: string;

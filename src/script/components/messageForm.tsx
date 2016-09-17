@@ -5,7 +5,7 @@ import {List, Map} from "immutable";
 import Dispatcher from "../actionCreators/dispatcher";
 
 import {UserInfoUtil} from "../utils/userInfo";
-import {IUserInfo, IMessage} from "../definition/definitions";
+import {IUserInfo, IMessage} from "../definitions/definitions";
 import MessageBox from "./messageBox.tsx";
 
 interface MessageFormProps {

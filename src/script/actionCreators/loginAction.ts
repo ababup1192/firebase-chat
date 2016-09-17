@@ -2,7 +2,7 @@ import * as Bacon from "baconjs";
 import Dispatcher from "./dispatcher";
 import * as Firebase from "firebase";
 import {List} from "immutable";
-import {IUserInfo} from "../definition/definitions";
+import {IUserInfo} from "../definitions/definitions";
 import {UserInfoUtil} from "../utils/userInfo";
 
 const LOGIN = "LOGIN";

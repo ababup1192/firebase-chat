@@ -3,7 +3,7 @@ import Dispatcher from "./dispatcher";
 import * as Firebase from "firebase";
 import {List} from "immutable";
 
-import {HeaderInfo} from "../definition/definitions";
+import {HeaderInfo} from "../definitions/headerInfo";
 
 const LOGIN = "LOGIN";
 const CHANGE_ITEM = "CHANGE_ITEM";

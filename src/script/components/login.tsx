@@ -6,7 +6,7 @@ import * as Firebase from "firebase";
 import Dispatcher from "../actionCreators/dispatcher";
 import {HeaderAction} from "../actionCreators/headerAction";
 import {LoginAction} from "../actionCreators/loginAction";
-import {IUserInfo} from "../definition/definitions";
+import {IUserInfo} from "../definitions/definitions";
 import {UserInfoUtil} from "../utils/userInfo";
 
 interface LoginProps {

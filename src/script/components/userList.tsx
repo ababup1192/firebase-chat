@@ -5,7 +5,7 @@ import {List, Map, Record} from "immutable";
 
 import Dispatcher from "../actionCreators/dispatcher";
 import {UserInfoUtil} from "../utils/userInfo";
-import {IUserInfo} from "../definition/definitions";
+import {IUserInfo} from "../definitions/definitions";
 import {UserListAction} from "../actionCreators/userListAction";
 
 interface UsersListProps {

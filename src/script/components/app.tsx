@@ -6,7 +6,8 @@ import * as Bacon from "baconjs";
 import Dispatcher from "../actionCreators/dispatcher";
 
 /* Definition */
-import {HeaderInfo, IUserInfo} from "../definition/definitions";
+import {IUserInfo} from "../definitions/definitions";
+import {HeaderInfo} from "../definitions/headerInfo";
 
 /* Utils */
 import {UserInfoUtil} from "../utils/userInfo";

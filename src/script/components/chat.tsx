@@ -5,7 +5,7 @@ import {List, Map} from "immutable";
 import Dispatcher from "../actionCreators/dispatcher";
 
 /* Definition */
-import {IUserInfo, IMessage} from "../definition/definitions";
+import {IUserInfo, IMessage} from "../definitions/definitions";
 
 /* Action */
 import {UserListAction} from "../actionCreators/userListAction";

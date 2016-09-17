@@ -1,5 +1,5 @@
 import {List} from "immutable";
-import {IUserInfo, IFirebaseUserInfo, IMessage, IFirebaseMessage} from "../definition/definitions"
+import {IUserInfo, IFirebaseUserInfo, IMessage, IFirebaseMessage} from "../definitions/definitions";
 
 export class UserInfoUtil {
 
