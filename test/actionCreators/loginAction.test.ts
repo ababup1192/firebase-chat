@@ -13,6 +13,7 @@ describe("LoginAction", () => {
             chai.assert.isTrue(expected.equals(actual))
         );
         loginAction.login(UserInfo.create("abcd", "ABCD", "http://photo/abcd.jpg", now));
+        loginAction.end();
     });
 });
 

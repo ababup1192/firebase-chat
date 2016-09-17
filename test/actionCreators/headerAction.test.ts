@@ -11,6 +11,7 @@ describe("HeaderAction", () => {
         headerEvent.onValue((actual) =>
             chai.assert.isTrue(expected.equals(actual))
         );
+        headerAction.end();
     });
     it("should return login value", () => {
         const expected = HeaderInfo.login();
@@ -19,7 +20,8 @@ describe("HeaderAction", () => {
         headerEvent.skip(1).onValue((actual) =>
             chai.assert.isTrue(expected.equals(actual))
         );
-        headerAction.login();
+        headerAction.login(); // actual
+        headerAction.end();
     });
     it("should return Settings Item", () => {
         const expected = HeaderInfo.create(true, "Settings");
@@ -28,8 +30,9 @@ describe("HeaderAction", () => {
         headerEvent.skip(2).onValue((actual) =>
             chai.assert.isTrue(expected.equals(actual))
         );
-        headerAction.login();
-        headerAction.changeItem("Settings");
+        headerAction.login();                 // skip2
+        headerAction.changeItem("Settings");  // actual
+        headerAction.end();
     });
     it("should return logout value", () => {
         const expected = HeaderInfo.logout();
@@ -38,8 +41,9 @@ describe("HeaderAction", () => {
         headerEvent.skip(2).onValue((actual) =>
             chai.assert.isTrue(expected.equals(actual))
         );
-        headerAction.login();
-        headerAction.logout();
+        headerAction.login();  // skip2
+        headerAction.logout(); // actual
+        headerAction.end();
     });
 });
 
