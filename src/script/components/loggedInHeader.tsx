@@ -26,7 +26,7 @@ export default class LoggedInHeader extends React.Component<LoggedInHeaderProps,
     }
 
     private handleClick(selectedItem: string) {
-        this.props.headerAction.changeItem({ isLogin: true, selectedItem: selectedItem });
+        this.props.headerAction.changeItem(selectedItem);
         this.setState({ selectedItem: selectedItem });
     }
 
@@ -37,7 +37,7 @@ export default class LoggedInHeader extends React.Component<LoggedInHeaderProps,
                 , function (error) {
                     console.error(error);
                 });
-            this.props.headerAction.changeItem({ isLogin: false, selectedItem: "Log in" });
+            this.props.headerAction.logout();
         }
     }
 

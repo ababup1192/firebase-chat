@@ -6,10 +6,8 @@ import * as Bacon from "baconjs";
 import Dispatcher from "../actionCreators/dispatcher";
 
 /* Definition */
-import {IHeaderInfo, IUserInfo} from "../definition/definitions";
-
-/* Utils */
-import {UserInfoUtil} from "../utils/userInfo";
+import {UserInfo} from "../definitions/userInfo";
+import {HeaderInfo} from "../definitions/headerInfo";
 
 /* Action */
 import {HeaderAction} from "../actionCreators/headerAction";
@@ -38,9 +36,9 @@ export default class App extends React.Component<any, AppState> {
 
     /* Action and Event */
     private headerAction: HeaderAction;
-    private headerEvent: Bacon.Property<IHeaderInfo, IHeaderInfo>;
+    private headerEvent: Bacon.Property<HeaderInfo, HeaderInfo>;
     private loginAction: LoginAction;
-    private loginEvent: Bacon.Property<IUserInfo, IUserInfo>;
+    private loginEvent: Bacon.Property<UserInfo, UserInfo>;
 
     constructor(props) {
         super(props);
@@ -66,33 +64,30 @@ export default class App extends React.Component<any, AppState> {
         this.loginEvent = this.loginAction.createProperty();
     }
 
-    private updateLoginStatus(user: IUserInfo) {
+    private updateLoginStatus(user: UserInfo) {
+        const currentUser = user.updateLoginStatus();
         if (Firebase.auth().currentUser) {
-            this.loginStatusRef.child(user.uid).set(UserInfoUtil.toFirebaseUserInfo({
-                uid: user.uid,
-                displayName: user.displayName,
-                photoURL: user.photoURL,
-                updateTime: new Date()
-            }));
-            return new Bacon.Next<IUserInfo>(user);
+            this.loginStatusRef.child(currentUser.uid()).set(currentUser.toFirebaseObj());
+            return new Bacon.Next<UserInfo>(user);
         } else {
-            return new Bacon.End<IUserInfo>();
+            return new Bacon.End<UserInfo>();
         }
 
     }
 
-    private updateLoginStatusRepeatedly(user: IUserInfo): Bacon.EventStream<{}, IUserInfo> {
-        return Bacon.fromPoll<{}, IUserInfo>(2 * 1000, this.updateLoginStatus.bind(this, user));
+    private updateLoginStatusRepeatedly(user: UserInfo): Bacon.EventStream<{}, UserInfo> {
+        return Bacon.fromPoll<{}, UserInfo>(2 * 1000, this.updateLoginStatus.bind(this, user));
     }
 
     private refreshLoginStatus(): Bacon.Next<any> | Bacon.End<any> {
+        const now = new Date().getTime();
         if (Firebase.auth().currentUser) {
             this.loginStatusRef.once("value").then((snapShot: Firebase.database.DataSnapshot) => {
-                const now = new Date().getTime();
-                UserInfoUtil.toUserInfoList(snapShot.val()).filter((user: IUserInfo) =>
-                    ((now - user.updateTime.getTime()) / 1000) > 7
-                ).forEach((user: IUserInfo) =>
-                    this.loginStatusRef.child(user.uid).remove());
+                UserInfo.toUserInfoList(snapShot.val()).filter((user: UserInfo) => {
+                    return ((now - user.updateTime().getTime()) / 1000) > 5;
+                }
+                ).forEach((user: UserInfo) =>
+                    this.loginStatusRef.child(user.uid()).remove());
             });
             return new Bacon.Next(null);
         } else {
@@ -104,19 +99,19 @@ export default class App extends React.Component<any, AppState> {
         return Bacon.fromPoll<any, any>(20 * 1000, this.refreshLoginStatus.bind(this));
     }
 
-    private updateUserInfo(user: IUserInfo) {
-        this.usersRef.child(user.uid).set(UserInfoUtil.toFirebaseUserInfo(user));
+    private updateUserInfo(user: UserInfo) {
+        this.usersRef.child(user.uid()).set(user.toFirebaseObj());
     }
 
     private componentDidMount() {
-        this.loginEvent.onValue((user: IUserInfo) => {
+        this.loginEvent.onValue((user: UserInfo) => {
             if (Firebase.auth().currentUser) {
                 this.setState({
                     isLogin: true,
                     selectedItem: "Main",
-                    uid: user.uid,
-                    displayName: user.displayName,
-                    photoURL: user.photoURL
+                    uid: user.uid(),
+                    displayName: user.displayName(),
+                    photoURL: user.photoURL()
                 });
 
                 this.updateLoginStatus(user);
@@ -127,10 +122,10 @@ export default class App extends React.Component<any, AppState> {
             }
         });
 
-        this.headerEvent.onValue((item) => {
+        this.headerEvent.onValue((header) => {
             this.setState({
-                isLogin: item.isLogin,
-                selectedItem: item.selectedItem,
+                isLogin: header.isLogin(),
+                selectedItem: header.selectedItem(),
                 uid: this.state.uid,
                 photoURL: this.state.photoURL,
                 displayName: this.state.displayName
@@ -171,6 +166,7 @@ export default class App extends React.Component<any, AppState> {
                 <NoLoggedInHeader />
                 <Login
                     usersRef={this.usersRef}
+                    headerAction={this.headerAction}
                     loginAction={this.loginAction}
                     />
             </div>;

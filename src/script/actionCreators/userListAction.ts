@@ -3,7 +3,7 @@ import Dispatcher from "./dispatcher";
 import * as Firebase from "firebase";
 import {List} from "immutable";
 
-import {IUserInfo} from "../definition/definitions";
+import {UserInfo} from "../definitions/userInfo";
 
 const PUSH = "PUSH";
 const DELELTE = "DELETE";
@@ -16,7 +16,7 @@ export class UserListAction {
         this.d = dispatcher;
     }
 
-    public push(userInfo: IUserInfo) {
+    public push(userInfo: UserInfo) {
         this.d.push(PUSH, userInfo);
     }
 
@@ -34,23 +34,23 @@ export class UserListAction {
         this.d.stream(CLEAR).end();
     }
 
-    public createProperty(): Bacon.Property<string, List<IUserInfo>> {
-        return Bacon.update<string, IUserInfo, string, any, List<IUserInfo>>(List<IUserInfo>(),
+    public createProperty(): Bacon.Property<string, List<UserInfo>> {
+        return Bacon.update<string, UserInfo, string, any, List<UserInfo>>(List<UserInfo>(),
             [this.d.stream(PUSH)], this._push.bind(this),
             [this.d.stream(DELELTE)], this._delete.bind(this),
             [this.d.stream(CLEAR)], this._clear.bind(this)
         );
     }
 
-    private _push(userList: List<IUserInfo>, uidWithName: IUserInfo): List<IUserInfo> {
+    private _push(userList: List<UserInfo>, uidWithName: UserInfo): List<UserInfo> {
         return userList.push(uidWithName);
     }
 
-    private _delete(userList: List<IUserInfo>, uid: string): List<IUserInfo> {
-        return userList.filterNot((user) => user.uid === uid).toList();
+    private _delete(userList: List<UserInfo>, uid: string): List<UserInfo> {
+        return userList.filterNot((user) => user.uid() === uid).toList();
     }
 
-    private _clear(userList: List<IUserInfo>, ignore: any): List<IUserInfo> {
-        return List<IUserInfo>();
+    private _clear(userList: List<UserInfo>, ignore: any): List<UserInfo> {
+        return List<UserInfo>();
     }
 }
