@@ -11,7 +11,7 @@ import {HeaderInfo} from "../definitions/headerInfo";
 
 /* Action */
 import {HeaderAction} from "../actionCreators/headerAction";
-import {LoginAction} from "../actionCreators/LoginAction";
+import {LoginAction} from "../actionCreators/loginAction";
 
 /* Component */
 import NoLoggedInHeader from "./noLoggedInHeader.tsx";

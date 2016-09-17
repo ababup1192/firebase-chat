@@ -1,5 +1,5 @@
 import * as Bacon from "baconjs";
-import {Map} from "Immutable";
+import {Map} from "immutable";
 
 export default class Dispatcher {
     private hundlers: Map<string, Bacon.Bus<any, any>>;

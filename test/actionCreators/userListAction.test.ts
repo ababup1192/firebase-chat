@@ -1,5 +1,5 @@
 import {List, Record} from "immutable";
-import {UserInfo} from "../../src/script/definitions/UserInfo";
+import {UserInfo} from "../../src/script/definitions/userInfo";
 import Dispatcher from "../../src/script/actionCreators/dispatcher";
 import {UserListAction} from "../../src/script/actionCreators/userListAction";
 
