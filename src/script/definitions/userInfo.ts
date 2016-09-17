@@ -38,12 +38,14 @@ export class UserInfo extends UserInfoRecord {
         return this.updateTime().getTime();
     }
 
+    /*
     public toFirebase(): Map<string, any> {
         return Map(this.set(UPDATE_TIME, this.updateTimeToMs()).toObject());
     }
+    */
 
     public toFirebaseObj(): { [key: string]: any } {
-        return this.toFirebase().toObject();
+        return this.set(UPDATE_TIME, this.updateTimeToMs()).toObject();
     }
 
     public static fromFirebaseObj(obj: { [key: string]: any }): UserInfo {
@@ -55,9 +57,10 @@ export class UserInfo extends UserInfoRecord {
         return List(Object.keys(firebaseObjList).map((uid) =>
             UserInfo.fromFirebaseObj(firebaseObjList[uid])));
     }
-
+    /*
     public static toFirebaseUserInfoList(userInfoList: List<UserInfo>): List<Map<string, any>> {
         return userInfoList.map((userInfo) => userInfo.toFirebase()).toList();
     }
+    */
 }
 

@@ -34,19 +34,9 @@ describe("UserrInfo", () => {
         const actual = userInfo.updateTime();
         chai.assert.equal(expected, actual);
     });
-    it("should access updateTime", () => {
-        const expected = NOW;
-        const actual = userInfo.updateTime();
-        chai.assert.equal(expected, actual);
-    });
     it("should change displayName", () => {
         const expected = UserInfo.create(UID, "EFGH", PHOTO_URL, NOW);
         const actual = userInfo.changeDisplayName("EFGH");
-        chai.assert.isTrue(expected.equals(actual));
-    });
-    it("should change FirebaseRecord", () => {
-        const expected = Record({ uid: UID, displayName: DISPLAY_NAME, photoURL: PHOTO_URL, updateTime: NOW.getTime() })();
-        const actual = userInfo.toFirebase();
         chai.assert.isTrue(expected.equals(actual));
     });
     it("should change FirebaseObj", () => {
@@ -62,11 +52,6 @@ describe("UserrInfo", () => {
     it("should change UserInfoList", () => {
         const expected = List.of(userInfo);
         const actual = UserInfo.toUserInfoList({ [UID]: userInfo.toFirebaseObj() });
-        chai.assert.isTrue(expected.equals(actual));
-    });
-    it("should change FirebaseUserInfoList", () => {
-        const expected = List.of(Record({ uid: UID, displayName: DISPLAY_NAME, photoURL: PHOTO_URL, updateTime: NOW.getTime() })());
-        const actual = UserInfo.toFirebaseUserInfoList(List.of(userInfo));
         chai.assert.isTrue(expected.equals(actual));
     });
 });
