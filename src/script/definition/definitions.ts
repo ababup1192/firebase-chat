@@ -31,10 +31,6 @@ export class HeaderInfo extends HeaderInfoRecord {
         return HeaderInfo.create(false, "Log in");
     }
 }
-export interface IHeaderInfo {
-    isLogin: boolean;
-    selectedItem: string;
-}
 
 /* User Info */
 export interface IUserInfo {
