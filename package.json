@@ -6,6 +6,7 @@
   "scripts": {
     "start": "webpack-dev-server",
     "build": "webpack",
+    "deploy": "firebase deploy",
     "test": "karma start",
     "single-test": "karma start --single-run"
   },
@@ -17,6 +18,7 @@
     "chai-immutable": "^1.6.0",
     "css-loader": "^0.23.1",
     "firebase": "^3.3.2",
+    "firebase-tools": "^3.0.7",
     "html-webpack-plugin": "^2.22.0",
     "immutable": "^3.8.1",
     "karma": "^1.1.2",
