@@ -1,4 +1,4 @@
-# React Template
+# Firebase Chat
 
 [![CircleCI](https://circleci.com/gh/ababup1192/firebase-chat.svg?style=svg)](https://circleci.com/gh/ababup1192/firebase-chat)
 
