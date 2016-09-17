@@ -4,8 +4,7 @@ import * as Firebase from "firebase";
 import {List, Map, Record} from "immutable";
 
 import Dispatcher from "../actionCreators/dispatcher";
-import {UserInfoUtil} from "../utils/userInfo";
-import {IUserInfo} from "../definitions/definitions";
+import {UserInfo} from "../definitions/userInfo";
 import {UserListAction} from "../actionCreators/userListAction";
 
 interface UsersListProps {
@@ -16,7 +15,7 @@ interface UsersListProps {
 }
 
 interface UsersListState {
-    loginStatusList: List<IUserInfo>;
+    loginStatusList: List<UserInfo>;
     selectedUserList: List<string>;
 }
 
@@ -27,18 +26,18 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         super(props);
 
         this.isMount = false;
-        this.state = { loginStatusList: List<IUserInfo>(), selectedUserList: List<string>() };
+        this.state = { loginStatusList: List<UserInfo>(), selectedUserList: List<string>() };
     }
 
     public componentDidMount() {
         this.isMount = true;
         this.props.loginStatusRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
             if (this.isMount && snapShot.val()) {
-                const loginStatusList = UserInfoUtil.toUserInfoList(snapShot.val());
+                const loginStatusList = UserInfo.toUserInfoList(snapShot.val());
                 this.setState({
                     loginStatusList: loginStatusList.filter((user) =>
-                        user.uid === this.props.uid).concat(loginStatusList.filterNot((user) =>
-                            user.uid === this.props.uid)).toList(),
+                        user.uid() === this.props.uid).concat(loginStatusList.filterNot((user) =>
+                            user.uid() === this.props.uid)).toList(),
                     selectedUserList: this.state.selectedUserList
                 });
             }
@@ -54,14 +53,14 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
         this.props.userListAction.clear();
     }
 
-    private handleClickItem(clickedUserInfo: IUserInfo, e: MouseEvent) {
-        if (this.state.selectedUserList.contains(clickedUserInfo.uid)) {
+    private handleClickItem(clickedUserInfo: UserInfo, e: MouseEvent) {
+        if (this.state.selectedUserList.contains(clickedUserInfo.uid())) {
             const selectedUserList: List<string> = this.state.selectedUserList.
-                filterNot((uid) => uid === clickedUserInfo.uid).toList();
+                filterNot((uid) => uid === clickedUserInfo.uid()).toList();
             this.setState({ loginStatusList: this.state.loginStatusList, selectedUserList: selectedUserList });
-            this.props.userListAction.delete(clickedUserInfo.uid);
+            this.props.userListAction.delete(clickedUserInfo.uid());
         } else {
-            const selectedUserList: List<string> = this.state.selectedUserList.push(clickedUserInfo.uid);
+            const selectedUserList: List<string> = this.state.selectedUserList.push(clickedUserInfo.uid());
             this.setState({ loginStatusList: this.state.loginStatusList, selectedUserList: selectedUserList });
             this.props.userListAction.push(clickedUserInfo);
         }
@@ -80,9 +79,9 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
                         key={`users-${idx}`}
                         onClick={this.handleClickItem.bind(this, user) }
                         >
-                        <div className={`userinfo ${userClass(user.uid)}`}>
-                            <img src={ user.photoURL } />
-                            <p>{user.displayName}</p>
+                        <div className={`userinfo ${userClass(user.uid())}`}>
+                            <img src={ user.photoURL() } />
+                            <p>{user.displayName()}</p>
                         </div>
                     </li>
                 )

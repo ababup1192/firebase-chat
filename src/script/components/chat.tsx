@@ -5,7 +5,8 @@ import {List, Map} from "immutable";
 import Dispatcher from "../actionCreators/dispatcher";
 
 /* Definition */
-import {IUserInfo, IMessage} from "../definitions/definitions";
+import {UserInfo} from "../definitions/userInfo";
+import {Message} from "../definitions/message";
 
 /* Action */
 import {UserListAction} from "../actionCreators/userListAction";
@@ -23,17 +24,17 @@ interface ChatProps {
 }
 
 interface ChatState {
-    usersList: List<IUserInfo>;
+    usersList: List<UserInfo>;
 }
 
 export default class Chat extends React.Component<ChatProps, ChatState> {
     private userListAction: UserListAction;
-    private userListEvent: Bacon.Property<string, List<IUserInfo>>;
+    private userListEvent: Bacon.Property<string, List<UserInfo>>;
 
     constructor(props) {
         super(props);
 
-        this.state = { usersList: List<IUserInfo>() };
+        this.state = { usersList: List<UserInfo>() };
 
         this.userListAction = new UserListAction(new Dispatcher());
         this.userListEvent = this.userListAction.createProperty();

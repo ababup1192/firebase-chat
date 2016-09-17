@@ -66,6 +66,29 @@ describe("Message", () => {
         const actual = message.isAllMessage();
         chai.assert.equal(expected, actual);
     });
+    it("should return true if sender is me", () => {
+        const expected = true;
+        const actual = message.isShow(UID);
+        chai.assert.equal(expected, actual);
+    });
+    it("should return true if message is for all", () => {
+        const emptyMessage = Message.create(UID, DISPLAY_NAME,
+            PHOTO_URL, List<UserInfo>(), CONTENT, NOW);
+        const expected = true;
+        const actual = emptyMessage.isShow("xxxx");
+        chai.assert.equal(expected, actual);
+    });
+    it("should return false", () => {
+        const expected = false;
+        const actual = message.isShow("xxxx");
+        chai.assert.equal(expected, actual);
+    });
+    it("should return true if toUser have me", () => {
+        const expected = true;
+        const actual = message.isShow("ijkl");
+        chai.assert.equal(expected, actual);
+    });
+
     it("should return ALL", () => {
         const expected = "(ALL)";
         const emptyMessage = Message.create(UID, DISPLAY_NAME,
@@ -83,14 +106,14 @@ describe("Message", () => {
         const actual = message.toUsersString("ijkl");
         chai.assert.equal(expected, actual);
     });
-    it("should return messageClassName me", () => {
+    it("should return className me", () => {
         const expected = "message-me";
-        const actual = message.messageClassName(UID);
+        const actual = message.className(UID);
         chai.assert.equal(expected, actual);
     });
     it("should return messageClassName other", () => {
         const expected = "message-other";
-        const actual = message.messageClassName("ijkl");
+        const actual = message.className("ijkl");
         chai.assert.equal(expected, actual);
     });
     it("should change Message", () => {

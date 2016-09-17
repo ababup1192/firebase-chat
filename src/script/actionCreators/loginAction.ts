@@ -2,8 +2,7 @@ import * as Bacon from "baconjs";
 import Dispatcher from "./dispatcher";
 import * as Firebase from "firebase";
 import {List} from "immutable";
-import {IUserInfo} from "../definitions/definitions";
-import {UserInfoUtil} from "../utils/userInfo";
+import {UserInfo} from "../definitions/userInfo";
 
 const LOGIN = "LOGIN";
 
@@ -14,7 +13,7 @@ export class LoginAction {
         this.d = dispatcher;
     }
 
-    public login(userInfo: IUserInfo) {
+    public login(userInfo: UserInfo) {
         this.d.push(LOGIN, userInfo);
     }
 
@@ -22,13 +21,13 @@ export class LoginAction {
         this.d.stream(LOGIN).end();
     }
 
-    public createProperty(): Bacon.Property<IUserInfo, IUserInfo> {
-        return Bacon.update<IUserInfo, IUserInfo, IUserInfo>({ uid: "", photoURL: "", displayName: "", updateTime: new Date() },
+    public createProperty(): Bacon.Property<UserInfo, UserInfo> {
+        return Bacon.update<UserInfo, UserInfo, UserInfo>(new UserInfo(),
             [this.d.stream(LOGIN)], this._login.bind(this)
         );
     }
 
-    private _login(old: IUserInfo, newUserInfo: IUserInfo): IUserInfo {
+    private _login(old: UserInfo, newUserInfo: UserInfo): UserInfo {
         return newUserInfo;
     }
 }

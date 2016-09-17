@@ -34,15 +34,13 @@ export class UserInfo extends UserInfoRecord {
         return new UserInfo(this.set(DISPLAY_NAME, displayName).toObject());
     }
 
+    public updateLoginStatus(): UserInfo {
+        return new UserInfo(this.set(UPDATE_TIME, new Date()).toObject());
+    }
+
     public updateTimeToMs(): number {
         return this.updateTime().getTime();
     }
-
-    /*
-    public toFirebase(): Map<string, any> {
-        return Map(this.set(UPDATE_TIME, this.updateTimeToMs()).toObject());
-    }
-    */
 
     public toFirebaseObj(): { [key: string]: any } {
         return this.set(UPDATE_TIME, this.updateTimeToMs()).toObject();
@@ -57,10 +55,5 @@ export class UserInfo extends UserInfoRecord {
         return List(Object.keys(firebaseObjList).map((uid) =>
             UserInfo.fromFirebaseObj(firebaseObjList[uid])));
     }
-    /*
-    public static toFirebaseUserInfoList(userInfoList: List<UserInfo>): List<Map<string, any>> {
-        return userInfoList.map((userInfo) => userInfo.toFirebase()).toList();
-    }
-    */
-}
+ }
 

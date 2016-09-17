@@ -3,8 +3,7 @@ import * as ReactDOM from "react-dom";
 import * as Firebase from "firebase";
 import {List, Map} from "immutable";
 
-import {UserInfoUtil} from "../utils/userInfo";
-import {IMessage, IFirebaseMessage} from "../definitions/definitions";
+import {Message} from "../definitions/message";
 
 interface MessageBoxProps {
     uid: string;
@@ -12,7 +11,7 @@ interface MessageBoxProps {
 }
 
 interface MessageBoxState {
-    messageList: List<IMessage>;
+    messageList: List<Message>;
 }
 
 export default class MessageBox extends React.Component<MessageBoxProps, MessageBoxState> {
@@ -21,7 +20,7 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
     constructor(props) {
         super(props);
 
-        this.state = { messageList: List<IMessage>() };
+        this.state = { messageList: List<Message>() };
         this.isMount = false;
     }
 
@@ -41,7 +40,7 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
         this.props.chatRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
             const firebaseMessageList = snapShot.val();
             if (this.isMount && firebaseMessageList) {
-                const messageList: List<IMessage> = UserInfoUtil.toMessageList(firebaseMessageList);
+                const messageList: List<Message> = Message.toMessageList(firebaseMessageList);
                 this.setState({ messageList: messageList });
             }
         });
@@ -53,16 +52,13 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
     }
 
     render() {
+        const placeHolder = (message: Message) => `${message.displayName()}  =>  ${message.toUsersString(this.props.uid)}`;
         return <ul className="messagebox" ref="messagebox">
             {
-                this.state.messageList.filter((message) =>
-                    message.to.isEmpty() || message.uid === this.props.uid || message.to.some((m) => m.uid === this.props.uid)
-                ).map((message, lidx) => {
-                    const to = `( ${message.to.isEmpty() ? "ALL" : message.to.map((m) =>
-                        m.uid === this.props.uid ? "ME" : m.displayName).join(" and ")} )`;
-                    return <li key={`box-line-${lidx}`} className={message.uid === this.props.uid ? "message-me" : "message-other"}>
-                        <p key={`box-line-${lidx}-header`}>{`${message.displayName}  =>  ${to}`}</p>
-                        {message.content.split("\n").map((line, pidx) =>
+                this.state.messageList.filter((message) => message.isShow(this.props.uid)).map((message, lidx) => {
+                    return <li key={`box-line-${lidx}`} className={message.className(this.props.uid)}>
+                        <p key={`box-line-${lidx}-header`}>{placeHolder(message)}</p>
+                        {message.content().split("\n").map((line, pidx) =>
                             <p key={`box-line-${lidx}-p-${pidx}`}>{line}</p>
                         ) }
                     </li>;

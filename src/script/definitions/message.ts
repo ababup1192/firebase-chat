@@ -50,13 +50,17 @@ export class Message extends MessageRecord {
         return this.to().isEmpty();
     }
 
-    public toUsersString(meUid: string): string {
-        return this.isAllMessage() ? "(ALL)" :
-            this.to().map(user => user.uid() === meUid ? "(ME)" : user.displayName()).join(" and ");
+    public isShow(myUid): boolean {
+        return this.isAllMessage() || this.uid() === myUid || this.to().some((user) => user.uid() === myUid);
     }
 
-    public messageClassName(meUid): string {
-        return this.uid() === meUid ? "message-me" : "message-other";
+    public toUsersString(myUid: string): string {
+        return this.isAllMessage() ? "(ALL)" :
+            this.to().map(user => user.uid() === myUid ? "(ME)" : user.displayName()).join(" and ");
+    }
+
+    public className(myUid): string {
+        return this.uid() === myUid ? "message-me" : "message-other";
     }
 
     public postTimeToMs(): number {
@@ -69,7 +73,7 @@ export class Message extends MessageRecord {
     }
 
     public static fromFirebaseObj(obj: { [key: string]: any }): Message {
-        const messageMap = Map(obj).set(TO, obj[TO] === null ? List() :
+        const messageMap = Map(obj).set(TO, obj[TO] === undefined ? List() :
             UserInfo.toUserInfoList(obj[TO]))
             .set(POST_TIME, new Date(obj[POST_TIME]));
         return new Message(messageMap.toObject());

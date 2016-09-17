@@ -6,8 +6,7 @@ import * as Firebase from "firebase";
 import Dispatcher from "../actionCreators/dispatcher";
 import {HeaderAction} from "../actionCreators/headerAction";
 import {LoginAction} from "../actionCreators/loginAction";
-import {IUserInfo} from "../definitions/definitions";
-import {UserInfoUtil} from "../utils/userInfo";
+import {UserInfo} from "../definitions/userInfo";
 
 interface LoginProps {
     usersRef: Firebase.database.Reference;
@@ -34,12 +33,13 @@ export default class Login extends React.Component<LoginProps, LoginState> {
     private handleClickLogin() {
         if (this.state.uid !== "") {
             this.props.headerAction.login();
-            this.props.loginAction.login({
-                uid: this.state.uid,
-                displayName: this.state.displayName,
-                photoURL: this.state.photoURL,
-                updateTime: new Date()
-            });
+            this.props.loginAction.login(
+                UserInfo.create(
+                    this.state.uid,
+                    this.state.displayName,
+                    this.state.photoURL
+                )
+            );
         } else {
             alert("twitterボタンを押して、認証してからクリックしてください。");
         }
@@ -61,10 +61,11 @@ export default class Login extends React.Component<LoginProps, LoginState> {
         Firebase.auth().signInWithPopup(provider).then((result) => {
             const user = result.user;
             this.props.usersRef.child(user.uid).once("value").then((snapShot) => {
-                const dbUser: IUserInfo = snapShot.val() === null ? null : UserInfoUtil.toUserInfo(snapShot.val());
+                const dbVal = snapShot.val();
                 this.setState({
                     uid: user.uid,
-                    displayName: dbUser === null ? user.displayName : dbUser.displayName,
+                    displayName: dbVal === null ? user.displayName
+                        : UserInfo.fromFirebaseObj(dbVal).displayName(),
                     photoURL: user.photoURL
                 });
             });
