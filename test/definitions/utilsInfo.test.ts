@@ -2,37 +2,71 @@ import {List, Record, Map} from "immutable";
 import {UserInfo} from "../../src/script/definitions/userInfo";
 
 describe("UserrInfo", () => {
+    const UID = "abcd";
+    const DISPLAY_NAME = "ABCD";
+    const PHOTO_URL = "http://photo/abcd.jpg";
+    const NOW = new Date();
+    const record = Record({ uid: UID, displayName: DISPLAY_NAME, photoURL: PHOTO_URL, updateTime: NOW })();
+    const userInfo = UserInfo.create(UID, DISPLAY_NAME, PHOTO_URL, NOW);
+
     it("should create", () => {
-        const now = new Date();
-        const expected = Record({ uid: "abcd", displayName: "ABCD", photoURL: "http://photo/abcd.jpg", updateTime: now })();
-        const actual = UserInfo.create("abcd", "ABCD", "http://photo/abcd.jpg", now);
+        const expected = record;
+        const actual = userInfo;
         chai.assert.isTrue(expected.equals(actual));
     });
-    /*
-    it("should access isLogin", () => {
-        const expected = true;
-        const actual = HeaderInfo.create(true, "Log in").isLogin();
+    it("should access uid", () => {
+        const expected = UID;
+        const actual = userInfo.uid();
         chai.assert.equal(expected, actual);
     });
-    it("should access selectedItem", () => {
-        const expected = "Log in";
-        const actual = HeaderInfo.create(false, "Log in").selectedItem();
+    it("should access displayName", () => {
+        const expected = DISPLAY_NAME;
+        const actual = userInfo.displayName();
         chai.assert.equal(expected, actual);
     });
-    it("should return LoginState", () => {
-        const expected = HeaderInfo.create(true, "Main");
-        const actual = HeaderInfo.login();
+    it("should access photoURL", () => {
+        const expected = PHOTO_URL;
+        const actual = userInfo.photoURL();
+        chai.assert.equal(expected, actual);
+    });
+    it("should access updateTime", () => {
+        const expected = NOW;
+        const actual = userInfo.updateTime();
+        chai.assert.equal(expected, actual);
+    });
+    it("should access updateTime", () => {
+        const expected = NOW;
+        const actual = userInfo.updateTime();
+        chai.assert.equal(expected, actual);
+    });
+    it("should change displayName", () => {
+        const expected = UserInfo.create(UID, "EFGH", PHOTO_URL, NOW);
+        const actual = userInfo.changeDisplayName("EFGH");
         chai.assert.isTrue(expected.equals(actual));
     });
-    it("should return LogoutState", () => {
-        const expected = HeaderInfo.create(false, "Log in");
-        const actual = HeaderInfo.logout();
+    it("should change FirebaseRecord", () => {
+        const expected = Record({ uid: UID, displayName: DISPLAY_NAME, photoURL: PHOTO_URL, updateTime: NOW.getTime() })();
+        const actual = userInfo.toFirebase();
         chai.assert.isTrue(expected.equals(actual));
     });
-    it("should chage selectedItem", () => {
-        const expected = HeaderInfo.create(true, "Settings");
-        const actual = HeaderInfo.login().changeItem("Settings");
+    it("should change FirebaseObj", () => {
+        const expected = Record({ uid: UID, displayName: DISPLAY_NAME, photoURL: PHOTO_URL, updateTime: NOW.getTime() })();
+        const actual = Record(userInfo.toFirebaseObj())();
         chai.assert.isTrue(expected.equals(actual));
     });
-    */
+    it("should change UserInfo", () => {
+        const expected = userInfo;
+        const actual = UserInfo.fromFirebaseObj(userInfo.toFirebaseObj());
+        chai.assert.isTrue(expected.equals(actual));
+    });
+    it("should change UserInfoList", () => {
+        const expected = List.of(userInfo);
+        const actual = UserInfo.toUserInfoList({ [UID]: userInfo.toFirebaseObj() });
+        chai.assert.isTrue(expected.equals(actual));
+    });
+    it("should change FirebaseUserInfoList", () => {
+        const expected = List.of(Record({ uid: UID, displayName: DISPLAY_NAME, photoURL: PHOTO_URL, updateTime: NOW.getTime() })());
+        const actual = UserInfo.toFirebaseUserInfoList(List.of(userInfo));
+        chai.assert.isTrue(expected.equals(actual));
+    });
 });
