@@ -26,7 +26,7 @@ export class HeaderInfo extends HeaderInfoRecord {
     }
 
     public static logout(): HeaderInfo {
-        return HeaderInfo.create(false, "Log in");
+        return HeaderInfo.create(false, "Log In");
     }
 }
 

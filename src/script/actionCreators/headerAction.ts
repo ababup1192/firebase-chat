@@ -28,6 +28,12 @@ export class HeaderAction {
         this.d.push(LOGOUT, null);
     }
 
+    public end() {
+        this.d.stream(LOGIN).end();
+        this.d.stream(CHANGE_ITEM).end();
+        this.d.stream(LOGOUT).end();
+    }
+
     public createProperty(): Bacon.Property<HeaderInfo, HeaderInfo> {
         return Bacon.update<HeaderInfo, any, string, HeaderInfo, HeaderInfo>(HeaderInfo.create(false, "Log In"),
             [this.d.stream(LOGIN)], this._login.bind(this),
