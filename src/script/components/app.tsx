@@ -45,7 +45,7 @@ export default class App extends React.Component<any, AppState> {
 
         this.state = {
             isLogin: false,
-            selectedItem: "Log in",
+            selectedItem: "Log In",
             uid: "",
             displayName: "",
             photoURL: ""
