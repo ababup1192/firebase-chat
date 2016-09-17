@@ -1,6 +1,6 @@
 # React Template
 
-[![CircleCI](https://circleci.com/gh/ababup1192/react-template.svg?style=svg)](https://circleci.com/gh/ababup1192/react-template)
+[![CircleCI](https://circleci.com/gh/ababup1192/firebase-chat.svg?style=svg)](https://circleci.com/gh/ababup1192/firebase-chat)
 
 # Preparation
 
