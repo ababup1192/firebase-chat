@@ -10,7 +10,6 @@ interface MessageBoxProps {
     uid: string;
     chatRef: Firebase.database.Reference;
     chatAction: ChatAction;
-    chatEvent: Bacon.Property<List<Message>, List<Message>>;
 }
 
 interface MessageBoxState {
@@ -18,10 +17,13 @@ interface MessageBoxState {
 }
 
 export default class MessageBox extends React.Component<MessageBoxProps, MessageBoxState> {
+    private chatEvent: Bacon.Property<List<Message>, List<Message>>;
+
     constructor(props) {
         super(props);
 
         this.state = { messageList: List<Message>() };
+        this.chatEvent = this.props.chatAction.createProperty();
     }
 
     private autoScroll() {
@@ -36,8 +38,8 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
     }
 
     public componentDidMount() {
-        this.props.chatEvent.onValue((messages) => {
-            this.setState({ messageList: messages });
+        this.chatEvent.onValue((messages) => {
+            this.setState({ messageList: messages.sortBy((message) => message.postTime().getTime()).toList() });
         });
         this.props.chatRef.on("child_added", (snapShot: Firebase.database.DataSnapshot) => {
             const firebaseMessage = snapShot.val();

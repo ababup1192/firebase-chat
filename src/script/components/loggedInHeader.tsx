@@ -3,11 +3,14 @@ import * as ReactDOM from "react-dom";
 import * as Firebase from "firebase";
 
 import { HeaderAction } from "../actionCreators/headerAction";
+import { ChatAction } from "../actionCreators/chatAction";
 
 interface LoggedInHeaderProps {
-    loginStatusRef: Firebase.database.Reference;
+    displayName: string;
     photoURL: string;
+    loginStatusRef: Firebase.database.Reference;
     headerAction: HeaderAction;
+    chatAction: ChatAction;
 }
 
 interface LoggedInHeaderState {
@@ -33,6 +36,7 @@ export default class LoggedInHeader extends React.Component<LoggedInHeaderProps,
     private handleClickLogout() {
         if (confirm("ログアウトして、よろしいですか？")) {
             this.props.loginStatusRef.child(Firebase.auth().currentUser.uid).remove();
+            this.props.chatAction.systemPush(`「${this.props.displayName}」が、ログアウトしました。`);
             Firebase.auth().signOut().then(() => { }
                 , function (error) {
                     console.error(error);

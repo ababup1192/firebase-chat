@@ -76,5 +76,25 @@ describe("ChatAction", () => {
         chatAction.push(message2); // actual
         chatAction.end();
     });
+    it("should return pushed system message", () => {
+        const CONTENT = "system message";
+        const now = new Date();
+        const message = Message.create(
+            "system",
+            "SYSTEM",
+            "",
+            List<UserInfo>(),
+            CONTENT,
+            now);
+        const expected = List.of(message);
+        const chatAction = new ChatAction(new Dispatcher());
+        const chatEvent = chatAction.createProperty();
+        chatEvent.skip(1).onValue((actual) =>
+            chai.assert.isTrue(expected.equals(actual))
+        );
+        chatAction.systemPush(CONTENT, now);
+        chatAction.end();
+    });
+
 });
 

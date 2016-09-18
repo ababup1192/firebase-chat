@@ -22,6 +22,7 @@ interface ChatProps {
     usersRef: Firebase.database.Reference;
     chatRef: Firebase.database.Reference;
     loginStatusRef: Firebase.database.Reference;
+    chatAction: ChatAction;
 }
 
 interface ChatState {
@@ -31,8 +32,6 @@ interface ChatState {
 export default class Chat extends React.Component<ChatProps, ChatState> {
     private userListAction: UserListAction;
     private userListEvent: Bacon.Property<string, List<UserInfo>>;
-    private chatAction: ChatAction;
-    private chatEvent: Bacon.Property<List<Message>, List<Message>>;
 
     constructor(props) {
         super(props);
@@ -41,8 +40,6 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
 
         this.userListAction = new UserListAction(new Dispatcher());
         this.userListEvent = this.userListAction.createProperty();
-        this.chatAction = new ChatAction(new Dispatcher());
-        this.chatEvent = this.chatAction.createProperty();
     }
 
     public componentDidMount() {
@@ -51,7 +48,7 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
 
     public componentWillUnmount() {
         this.userListAction.end();
-        this.chatAction.end();
+        this.props.chatAction.end();
     }
 
     render() {
@@ -66,14 +63,13 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
                 <MessageBox
                     uid={this.props.uid}
                     chatRef={this.props.chatRef}
-                    chatAction={this.chatAction}
-                    chatEvent={this.chatEvent}
+                    chatAction={this.props.chatAction}
                     />
                 <MessageForm
                     uid={this.props.uid}
                     userRef={this.props.usersRef}
                     chatRef={this.props.chatRef}
-                    chatAction={this.chatAction}
+                    chatAction={this.props.chatAction}
                     toUsers={this.state.usersList}
                     />
             </div>
