@@ -55,5 +55,5 @@ export class UserInfo extends UserInfoRecord {
         return List(Object.keys(firebaseObjList).map((uid) =>
             UserInfo.fromFirebaseObj(firebaseObjList[uid])));
     }
- }
+}
 

@@ -6,12 +6,14 @@ import * as Bacon from "baconjs";
 import Dispatcher from "../actionCreators/dispatcher";
 
 /* Definition */
-import {UserInfo} from "../definitions/userInfo";
 import {HeaderInfo} from "../definitions/headerInfo";
+import {UserInfo} from "../definitions/userInfo";
+import {Message} from "../definitions/message";
 
 /* Action */
 import {HeaderAction} from "../actionCreators/headerAction";
 import {LoginAction} from "../actionCreators/loginAction";
+import {ChatAction} from "../actionCreators/chatAction";
 
 /* Component */
 import NoLoggedInHeader from "./noLoggedInHeader.tsx";
@@ -39,6 +41,7 @@ export default class App extends React.Component<any, AppState> {
     private headerEvent: Bacon.Property<HeaderInfo, HeaderInfo>;
     private loginAction: LoginAction;
     private loginEvent: Bacon.Property<UserInfo, UserInfo>;
+    private chatAction: ChatAction;
 
     constructor(props) {
         super(props);
@@ -83,11 +86,15 @@ export default class App extends React.Component<any, AppState> {
         const now = new Date().getTime();
         if (Firebase.auth().currentUser) {
             this.loginStatusRef.once("value").then((snapShot: Firebase.database.DataSnapshot) => {
-                UserInfo.toUserInfoList(snapShot.val()).filter((user: UserInfo) => {
-                    return ((now - user.updateTime().getTime()) / 1000) > 5;
+                const firebaseUserInfoList = snapShot.val();
+                if (firebaseUserInfoList) {
+                    UserInfo.toUserInfoList(firebaseUserInfoList).filter((user: UserInfo) =>
+                        ((now - user.updateTime().getTime()) / 1000) > 5
+                    ).forEach((user: UserInfo) => {
+                        this.loginStatusRef.child(user.uid()).remove();
+                        this.chatAction.systemPush(`「${user.displayName()}」が、タイムアウトしました。`);
+                    });
                 }
-                ).forEach((user: UserInfo) =>
-                    this.loginStatusRef.child(user.uid()).remove());
             });
             return new Bacon.Next(null);
         } else {
@@ -114,11 +121,13 @@ export default class App extends React.Component<any, AppState> {
                     photoURL: user.photoURL()
                 });
 
+                this.chatAction = new ChatAction(new Dispatcher(), this.chatRef);
                 this.updateLoginStatus(user);
                 this.updateLoginStatusRepeatedly(user).onValue(null);
                 this.refreshLoginStatus();
                 this.refreshLoginStatusRepeatedly().onValue(null);
                 this.updateUserInfo(user);
+                this.chatAction.systemPush(`「${user.displayName()}」が、ログインしました。`);
             }
         });
 
@@ -145,6 +154,7 @@ export default class App extends React.Component<any, AppState> {
                     usersRef={this.usersRef}
                     loginStatusRef={this.loginStatusRef}
                     chatRef={this.chatRef}
+                    chatAction={this.chatAction}
                     />;
             case "Settings":
                 return <p>Settings</p>;
@@ -155,9 +165,11 @@ export default class App extends React.Component<any, AppState> {
         return this.state.isLogin ?
             <div>
                 <LoggedInHeader
-                    loginStatusRef={ this.loginStatusRef }
+                    displayName={ this.state.displayName }
                     photoURL={ this.state.photoURL }
+                    loginStatusRef={ this.loginStatusRef }
                     headerAction={ this.headerAction }
+                    chatAction={ this.chatAction }
                     />
                 { this.selectContents() }
             </div>

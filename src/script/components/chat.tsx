@@ -10,6 +10,7 @@ import {Message} from "../definitions/message";
 
 /* Action */
 import {UserListAction} from "../actionCreators/userListAction";
+import {ChatAction} from "../actionCreators/chatAction";
 
 /* Component */
 import UserList from "./userList.tsx";
@@ -21,6 +22,7 @@ interface ChatProps {
     usersRef: Firebase.database.Reference;
     chatRef: Firebase.database.Reference;
     loginStatusRef: Firebase.database.Reference;
+    chatAction: ChatAction;
 }
 
 interface ChatState {
@@ -46,6 +48,7 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
 
     public componentWillUnmount() {
         this.userListAction.end();
+        this.props.chatAction.end();
     }
 
     render() {
@@ -60,11 +63,13 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
                 <MessageBox
                     uid={this.props.uid}
                     chatRef={this.props.chatRef}
+                    chatAction={this.props.chatAction}
                     />
                 <MessageForm
                     uid={this.props.uid}
                     userRef={this.props.usersRef}
                     chatRef={this.props.chatRef}
+                    chatAction={this.props.chatAction}
                     toUsers={this.state.usersList}
                     />
             </div>
