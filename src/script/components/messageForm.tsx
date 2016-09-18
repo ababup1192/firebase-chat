@@ -6,12 +6,13 @@ import Dispatcher from "../actionCreators/dispatcher";
 
 import {UserInfo} from "../definitions/userInfo";
 import {Message} from "../definitions/message";
-import MessageBox from "./messageBox.tsx";
+import {ChatAction} from "../actionCreators/chatAction";
 
 interface MessageFormProps {
     uid: string;
     userRef: Firebase.database.Reference;
     chatRef: Firebase.database.Reference;
+    chatAction: ChatAction;
     toUsers: List<UserInfo>;
 }
 

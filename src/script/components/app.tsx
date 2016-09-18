@@ -83,11 +83,13 @@ export default class App extends React.Component<any, AppState> {
         const now = new Date().getTime();
         if (Firebase.auth().currentUser) {
             this.loginStatusRef.once("value").then((snapShot: Firebase.database.DataSnapshot) => {
-                UserInfo.toUserInfoList(snapShot.val()).filter((user: UserInfo) => {
-                    return ((now - user.updateTime().getTime()) / 1000) > 5;
+                const firebaseUserInfoList = snapShot.val();
+                if (firebaseUserInfoList) {
+                    UserInfo.toUserInfoList(snapShot.val()).filter((user: UserInfo) => {
+                        return ((now - user.updateTime().getTime()) / 1000) > 5;
+                    }).forEach((user: UserInfo) =>
+                        this.loginStatusRef.child(user.uid()).remove());
                 }
-                ).forEach((user: UserInfo) =>
-                    this.loginStatusRef.child(user.uid()).remove());
             });
             return new Bacon.Next(null);
         } else {

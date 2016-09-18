@@ -10,6 +10,7 @@ import {Message} from "../definitions/message";
 
 /* Action */
 import {UserListAction} from "../actionCreators/userListAction";
+import {ChatAction} from "../actionCreators/chatAction";
 
 /* Component */
 import UserList from "./userList.tsx";
@@ -30,6 +31,8 @@ interface ChatState {
 export default class Chat extends React.Component<ChatProps, ChatState> {
     private userListAction: UserListAction;
     private userListEvent: Bacon.Property<string, List<UserInfo>>;
+    private chatAction: ChatAction;
+    private chatEvent: Bacon.Property<List<Message>, List<Message>>;
 
     constructor(props) {
         super(props);
@@ -38,6 +41,8 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
 
         this.userListAction = new UserListAction(new Dispatcher());
         this.userListEvent = this.userListAction.createProperty();
+        this.chatAction = new ChatAction(new Dispatcher());
+        this.chatEvent = this.chatAction.createProperty();
     }
 
     public componentDidMount() {
@@ -46,6 +51,7 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
 
     public componentWillUnmount() {
         this.userListAction.end();
+        this.chatAction.end();
     }
 
     render() {
@@ -60,11 +66,14 @@ export default class Chat extends React.Component<ChatProps, ChatState> {
                 <MessageBox
                     uid={this.props.uid}
                     chatRef={this.props.chatRef}
+                    chatAction={this.chatAction}
+                    chatEvent={this.chatEvent}
                     />
                 <MessageForm
                     uid={this.props.uid}
                     userRef={this.props.usersRef}
                     chatRef={this.props.chatRef}
+                    chatAction={this.chatAction}
                     toUsers={this.state.usersList}
                     />
             </div>

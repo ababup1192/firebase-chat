@@ -4,10 +4,13 @@ import * as Firebase from "firebase";
 import {List, Map} from "immutable";
 
 import {Message} from "../definitions/message";
+import {ChatAction} from "../actionCreators/chatAction";
 
 interface MessageBoxProps {
     uid: string;
     chatRef: Firebase.database.Reference;
+    chatAction: ChatAction;
+    chatEvent: Bacon.Property<List<Message>, List<Message>>;
 }
 
 interface MessageBoxState {
@@ -15,13 +18,10 @@ interface MessageBoxState {
 }
 
 export default class MessageBox extends React.Component<MessageBoxProps, MessageBoxState> {
-    private isMount: boolean;
-
     constructor(props) {
         super(props);
 
         this.state = { messageList: List<Message>() };
-        this.isMount = false;
     }
 
     private autoScroll() {
@@ -36,19 +36,14 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
     }
 
     public componentDidMount() {
-        this.isMount = true;
-        this.props.chatRef.on("value", (snapShot: Firebase.database.DataSnapshot) => {
-            const firebaseMessageList = snapShot.val();
-            if (this.isMount && firebaseMessageList) {
-                const messageList: List<Message> = Message.toMessageList(firebaseMessageList);
-                this.setState({ messageList: messageList });
-            }
+        this.props.chatEvent.onValue((messages) => {
+            this.setState({ messageList: messages });
+        });
+        this.props.chatRef.on("child_added", (snapShot: Firebase.database.DataSnapshot) => {
+            const firebaseMessage = snapShot.val();
+            this.props.chatAction.push(Message.fromFirebaseObj(firebaseMessage));
         });
         this.autoScroll();
-    }
-
-    public componentWillUnmount() {
-        this.isMount = false;
     }
 
     render() {
@@ -56,8 +51,8 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
         return <ul className="messagebox" ref="messagebox">
             {
                 this.state.messageList.filter((message) => message.isShow(this.props.uid)).map((message, lidx) => {
-                    return <li key={`box-line-${lidx}`} className={message.className(this.props.uid)}>
-                        <p key={`box-line-${lidx}-header`}>{placeHolder(message)}</p>
+                    return <li key={`box-line-${lidx}`} className={message.className(this.props.uid) }>
+                        <p key={`box-line-${lidx}-header`}>{placeHolder(message) }</p>
                         {message.content().split("\n").map((line, pidx) =>
                             <p key={`box-line-${lidx}-p-${pidx}`}>{line}</p>
                         ) }
