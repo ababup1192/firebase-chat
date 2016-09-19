@@ -89,7 +89,7 @@ export default class App extends React.Component<any, AppState> {
                 const firebaseUserInfoList = snapShot.val();
                 if (firebaseUserInfoList) {
                     UserInfo.toUserInfoList(firebaseUserInfoList).filter((user: UserInfo) =>
-                        ((now - user.updateTime().getTime()) / 1000) > 5
+                        ((now - user.updateTime().getTime()) / 1000) > 10
                     ).forEach((user: UserInfo) => {
                         this.loginStatusRef.child(user.uid()).remove();
                         this.chatAction.systemPush(`「${user.displayName()}」が、タイムアウトしました。`);

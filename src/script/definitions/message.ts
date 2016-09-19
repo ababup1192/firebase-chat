@@ -54,6 +54,16 @@ export class Message extends MessageRecord {
         return this.isAllMessage() || this.uid() === myUid || this.to().some((user) => user.uid() === myUid);
     }
 
+    public showPostTimeAMPM(): string {
+        const hoursMS: number = this.postTime().getHours();
+        const minutesMS: number = this.postTime().getMinutes();
+        const ampm = hoursMS >= 12 ? "PM" : "AM";
+        const hoursTmp: number = hoursMS % 12;
+        const hours = hoursTmp ? hoursTmp : 12;
+        const minutes = minutesMS < 10 ? "0" + minutesMS : minutesMS;
+        return `${hours}:${minutes} ${ampm}`;
+    }
+
     public toUsersString(myUid: string): string {
         return this.isAllMessage() ? "(ALL)" :
             this.to().map(user => user.uid() === myUid ? "(ME)" : user.displayName()).join(" and ");
