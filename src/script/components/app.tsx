@@ -103,7 +103,7 @@ export default class App extends React.Component<any, AppState> {
     }
 
     private refreshLoginStatusRepeatedly(): Bacon.EventStream<{}, {}> {
-        return Bacon.fromPoll<any, any>(20 * 1000, this.refreshLoginStatus.bind(this));
+        return Bacon.fromPoll<any, any>(10 * 1000, this.refreshLoginStatus.bind(this));
     }
 
     private updateUserInfo(user: UserInfo) {
