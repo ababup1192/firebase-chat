@@ -48,16 +48,27 @@ export default class MessageBox extends React.Component<MessageBoxProps, Message
         this.autoScroll();
     }
 
+    // <div key={`box-line-${lidx}-header`} className="messageContent">
     render() {
-        const placeHolder = (message: Message) => `${message.displayName()}  =>  ${message.toUsersString(this.props.uid)}`;
+        const placeHolder = (message: Message) => `${message.displayName()}${message.isAllMessage() ? "" : " (secret)"}`;
         return <ul className="messagebox" ref="messagebox">
             {
                 this.state.messageList.filter((message) => message.isShow(this.props.uid)).map((message, lidx) => {
-                    return <li key={`box-line-${lidx}`} className={message.className(this.props.uid) }>
-                        <p key={`box-line-${lidx}-header`}>{placeHolder(message) }</p>
-                        {message.content().split("\n").map((line, pidx) =>
-                            <p key={`box-line-${lidx}-p-${pidx}`}>{line}</p>
-                        ) }
+                    return <li key={`box-line-${lidx}`} className="message">
+                        <div>
+                            <img src={message.photoURL() } />
+                        </div>
+                        <div className="messageContent">
+                            <div className="boxNameAndDate">
+                                <p className="boxName">{ placeHolder(message) }</p>
+                                <p className="boxDate">{ message.showPostTimeAMPM() }</p>
+                            </div>
+                            <div>
+                                {message.content().split("\n").map((line, pidx) =>
+                                    <p key={`box-line-${lidx}-p-${pidx}`} className="boxContent">{line}</p>
+                                ) }
+                            </div>
+                        </div>
                     </li>;
                 })
             }

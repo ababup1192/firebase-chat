@@ -70,6 +70,8 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
     render() {
         const userClass = (uid: string) => this.state.selectedUserList.contains(uid) ?
             "selected" : "";
+        const showDisplayName = (user: UserInfo) => user.uid() === this.props.uid
+            ? `${user.displayName()} (you)` : user.displayName();
         return <ul className="users-list"
             onClick={this.handleClickList.bind(this) }
             >
@@ -80,8 +82,7 @@ export default class UserList extends React.Component<UsersListProps, UsersListS
                         onClick={this.handleClickItem.bind(this, user) }
                         >
                         <div className={`userinfo ${userClass(user.uid())}`}>
-                            <img src={ user.photoURL() } />
-                            <p>{user.displayName()}</p>
+                            <p>{ showDisplayName(user) }</p>
                         </div>
                     </li>
                 )
