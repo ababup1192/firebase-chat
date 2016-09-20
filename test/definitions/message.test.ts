@@ -128,4 +128,38 @@ describe("Message", () => {
         );
         chai.assert.isTrue(expected.equals(actual));
     });
+    it("shold return ContinuousMessageList", () => {
+        const id1 = "id1";
+        const id2 = "id2";
+        const id3 = "id3";
+        const PHOTO1 = `http://photo/${id1}.jpg`;
+        const PHOTO2 = `http://photo/${id2}.jpg`;
+        const PHOTO3 = `http://photo/${id3}.jpg`;
+        const date1 = new Date(2016, 9, 20, 0, 0, 0);
+        const date2 = new Date(2016, 9, 20, 0, 3, 0);
+        const date3 = new Date(2016, 9, 20, 0, 5, 0);
+        const date4 = new Date(2016, 9, 20, 0, 5, 10);
+        const date5 = new Date(2016, 9, 20, 0, 5, 30);
+        const date6 = new Date(2016, 9, 20, 0, 10, 15);
+        const date7 = new Date(2016, 9, 20, 0, 20, 0);
+        const date8 = new Date(2016, 9, 20, 0, 25, 0);
+        const message1 = Message.create(id1, id1.toUpperCase(), PHOTO1, List<UserInfo>(), "ai", date1);
+        const message2 = Message.create(id1, id1.toUpperCase(), PHOTO1, List<UserInfo>(), "aiai", date2);
+        const message3 = Message.create(id2, id2.toUpperCase(), PHOTO2, List<UserInfo>(), "ue", date3);
+        const message4 = Message.create(id3, id3.toUpperCase(), PHOTO3, List<UserInfo>(), "oka", date4);
+        const message5 = Message.create(id2, id2.toUpperCase(), PHOTO2, List<UserInfo>(), "kiku", date5);
+        const message6 = Message.create(id1, id1.toUpperCase(), PHOTO1, List<UserInfo>(), "keko", date6);
+        const message7 = Message.create(id1, id1.toUpperCase(), PHOTO1, List<UserInfo>(), "sasi", date7);
+        const message8 = Message.create(id1, id1.toUpperCase(), PHOTO1, List<UserInfo>(), "suse", date8);
+        const messages = List.of(message1, message2, message3,
+            message4, message5, message6, message7, message8);
+        const expected = List.of(
+            List.of(message1, message2),
+            List.of(message3),
+            List.of(message4),
+            List.of(message5),
+            List.of(message6, message7, message8));
+        const actual = Message.toContinuousMessageList(messages);
+        chai.assert.isTrue(expected.equals(actual));
+    });
 });

@@ -1,4 +1,4 @@
-import {List, Record, Iterable} from "immutable";
+import {List, Record, Iterable, Map, Range} from "immutable";
 import Dispatcher from "../../src/script/actionCreators/dispatcher";
 import {UserInfo} from "../../src/script/definitions/userInfo";
 import {Message} from "../../src/script/definitions/message";
@@ -94,42 +94,6 @@ describe("ChatAction", () => {
         );
         chatAction.systemPush(CONTENT, now);
         chatAction.end();
-    });
-    it("group by", () => {
-        interface Mem {
-            id: string;
-            num: number;
-        }
-        const id1 = "id1";
-        const id2 = "id2";
-        const group = List.of<Mem>(
-            { id: id1, num: 1 },
-            { id: id1, num: 2 },
-            { id: id2, num: 3 },
-            { id: id2, num: 7 },
-            { id: id1, num: 8 },
-            { id: id1, num: 9 },
-            { id: id1, num: 12 },
-            { id: id1, num: 15 },
-            { id: id1, num: 18 }
-        ).groupBy((mem: Mem, key: number, iter: Iterable<number, Mem>) => {
-            function collectGroupKeys(curKey: number,
-                desc = true, keys = List<number>()): List<number> {
-                const pastKey = curKey + (desc ? -1 : +1);
-                const pastNum = iter.has(pastKey) ? iter.get(pastKey).num : Number.MAX_VALUE;
-                if (curKey < 0 || curKey > iter.keySeq().last() ||
-                    iter.get(curKey).id !== mem.id ||
-                    Math.abs(pastNum - iter.get(curKey).num) > 3) {
-                    return keys;
-                } else {
-                    return desc ?
-                        collectGroupKeys(curKey + 1, true, keys.push(curKey)) :
-                        collectGroupKeys(curKey - 1, false, keys.unshift(curKey));
-                }
-            }
-            return collectGroupKeys(key - 1, false, List.of(key)).concat(collectGroupKeys(key + 1, true)).join("");
-        }).map((group) => group.map((value) => JSON.stringify(value))).toJS();
-        console.log(group);
     });
 });
 
